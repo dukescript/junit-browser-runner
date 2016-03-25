@@ -50,7 +50,7 @@
             <name>JUnit contributors</name>
             <organization>JUnit</organization>
             <email>junit@yahoogroups.com</email>
-            <url>https://github.com/junit-team/junit4/graphs/contributors</url>
+            <url>https://github.com/dukescript/junit-browser-runner/graphs/contributors</url>
             <roles>
                 <role>developers</role>
             </roles>
@@ -70,14 +70,14 @@
     </prerequisites>
 
     <scm>
-        <connection>scm:git:git://github.com/junit-team/junit4.git</connection>
-        <developerConnection>scm:git:git@github.com:junit-team/junit4.git</developerConnection>
-        <url>http://github.com/junit-team/junit4/tree/master</url>
+        <connection>scm:git:https://github.com/dukescript/junit-browser-runner.git</connection>
+        <url>https://github.com/dukescript/junit-browser-runner.git</url>
+        <developerConnection>scm:git:https://DukeScript@github.com/dukescript/junit-browser-runner.git</developerConnection>
       <tag>HEAD</tag>
   </scm>
     <issueManagement>
         <system>github</system>
-        <url>https://github.com/junit-team/junit4/issues</url>
+        <url>https://github.com/dukescript/junit-browser-runner/issues</url>
     </issueManagement>
     <ciManagement>
         <system>jenkins</system>
@@ -97,7 +97,7 @@
         </repository>
         <site>
             <id>junit.github.io</id>
-            <url>gitsite:git@github.com/junit-team/junit4.git</url>
+            <url>gitsite:git@github.com/dukescript/junit-browser-runner.git</url>
         </site>
     </distributionManagement>
 
