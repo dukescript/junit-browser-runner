@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>junit</groupId>
-    <artifactId>junit</artifactId>
-    <version>4.13-SNAPSHOT</version>
+    <groupId>com.dukescript.api</groupId>
+    <artifactId>junit-osgi</artifactId>
+    <version>4.12</version>
 
     <name>JUnit</name>
     <description>JUnit is a unit testing framework for Java, created by Erich Gamma and Kent Beck.</description>
@@ -101,7 +101,7 @@
     </distributionManagement>
 
     <properties>
-        <jdkVersion>1.5</jdkVersion>
+        <jdkVersion>1.7</jdkVersion>
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
         <arguments />
         <gpg.keyname>67893CC4</gpg.keyname>

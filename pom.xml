@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.dukescript.libraries</groupId>
+    <artifactId>pom</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>DukeScript JUnit Extensions</name>
+    <description>
+        JUnit extension to allow execution of unit tests
+        in all supported DukeScript platforms.
+    </description>
+    <developers>
+        <developer>
+            <id>monacotoni</id>
+            <name>Anton Epple</name>
+            <email>toni.epple@dukescript.com</email>
+            <organization>Dukehoff GmbH</organization>
+            <organizationUrl>http://www.dukescript.com</organizationUrl>
+            <roles>
+                <role>Project-Administrator</role>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>Eclipse Public License 1.0</name>
+            <url>http://www.eclipse.org/legal/epl-v10.html</url>
+            <distribution>repo</distribution>
+            <comments>
+                Keeping the same license as JUnit4.12
+            </comments>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:https://github.com/dukescript/junit-browser-runner.git</connection>
+        <url>https://github.com/dukescript/junit-browser-runner.git</url>
+        <developerConnection>scm:git:https://github.com/dukescript/junit-browser-runner.git</developerConnection>
+        <tag>release-${releaseVersion}</tag>
+    </scm>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <net.java.html.version>1.2.3</net.java.html.version>
+        <netbeans.compile.on.save>none</netbeans.compile.on.save>
+    </properties>
+    <modules>
+        <module>junit-osgi</module>
+        <module>junit-browser-runner</module>
+    </modules>
+    <profiles>
+        <profile>
+            <id>license</id>
+            <activation>
+                <property>
+                    <name>!skipLicenses</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>license-maven-plugin</artifactId>
+                        <version>1.7</version>
+                        <configuration>
+                            <inceptionYear>2016</inceptionYear>
+                            <organizationName>Dukehoff GmbH</organizationName>
+                            <failOnMissingHeader>true</failOnMissingHeader>
+                            <descriptionTemplate>src/license/header.txt</descriptionTemplate>
+                            <excludes>
+                                <exclude>**/target/**</exclude>
+                                <exclude>**/dependency*pom.xml</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>junit-browser-runner-license-check</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>check-file-header</goal>
+                                    <goal>update-file-header</goal>
+                                </goals>
+                                <configuration>
+                                    <licenseName>epl_v1</licenseName>
+                                    <failOnMissingHeader>true</failOnMissingHeader>
+                                    <descriptionTemplate>src/license/header.txt</descriptionTemplate>
+                                    <roots>
+                                        <root>junit-browser-runner</root>
+                                    </roots>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
