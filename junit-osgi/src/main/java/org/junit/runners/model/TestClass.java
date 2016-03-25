@@ -74,9 +74,13 @@ public class TestClass implements Annotatable {
     }
 
     private static Field[] getSortedDeclaredFields(Class<?> clazz) {
-        Field[] declaredFields = clazz.getDeclaredFields();
-        Arrays.sort(declaredFields, FIELD_COMPARATOR);
-        return declaredFields;
+        try {
+            Field[] declaredFields = clazz.getDeclaredFields();
+            Arrays.sort(declaredFields, FIELD_COMPARATOR);
+            return declaredFields;
+        } catch (SecurityException ex) {
+            return new Field[0];
+        }
     }
 
     protected static <T extends FrameworkMember<T>> void addToAnnotationLists(T member,
