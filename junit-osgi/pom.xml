@@ -84,28 +84,16 @@
         <url>https://junit.ci.cloudbees.com/</url>
     </ciManagement>
     <distributionManagement>
-        <downloadUrl>https://github.com/junit-team/junit4/wiki/Download-and-Install</downloadUrl>
         <snapshotRepository>
-            <id>junit-snapshot-repo</id>
-            <name>Nexus Snapshot Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
-        <repository>
-            <id>junit-releases-repo</id>
-            <name>Nexus Release Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-        <site>
-            <id>junit.github.io</id>
-            <url>gitsite:git@github.com/dukescript/junit-browser-runner.git</url>
-        </site>
     </distributionManagement>
 
     <properties>
         <jdkVersion>1.7</jdkVersion>
         <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
         <arguments />
-        <gpg.keyname>67893CC4</gpg.keyname>
     </properties>
 
     <dependencies>
@@ -142,6 +130,17 @@
                     </instructions>
                 </configuration>
                 <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.3</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
             </plugin>
             <!--
             Both "org.apache" and "org.codehaus" are default providers of MOJO plugins
