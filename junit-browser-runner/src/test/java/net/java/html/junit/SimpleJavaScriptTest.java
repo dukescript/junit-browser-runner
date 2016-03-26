@@ -38,6 +38,11 @@ public class SimpleJavaScriptTest {
     @JavaScriptBody(args = {  }, body = "return 33;")
     private static native int constant();
 
-    @JavaScriptBody(args = { "id" }, body = "return document.getElementById(id).innerHTML;")
+    @JavaScriptBody(args = { "id" }, body = "\n"
+        + "if (!document) return 'no document';\n"
+        + "var e = document.getElementById(id);\n"
+        + "if (!e) return 'no element for ' + id + ' body: ' + document.body.innerHTML;\n"
+        + "return e.innerHTML;\n"
+    )
     private static native String findElementText(String id);
 }
