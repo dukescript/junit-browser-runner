@@ -71,7 +71,11 @@ public final class BrowserRunner extends Suite {
             HTMLContent content = klass.getAnnotation(HTMLContent.class);
             if (content != null) {
                 try (FileWriter w = new FileWriter(page)) {
+                    w.write("<html>\n");
+                    w.write("<body>\n");
                     w.write(content.value());
+                    w.write("</body>\n");
+                    w.write("</html>\n");
                 }
             }
             url = page.toURI().toASCIIString();
