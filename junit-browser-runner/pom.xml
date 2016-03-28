@@ -83,6 +83,7 @@
         <bck2brwsr.version>0.18</bck2brwsr.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
+        <netbeans.compile.on.save>none</netbeans.compile.on.save>
     </properties>
     <build>
         <plugins>
