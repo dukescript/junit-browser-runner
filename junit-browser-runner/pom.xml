@@ -20,7 +20,7 @@
     <artifactId>junit-browser-runner</artifactId>
     <name>JUnit Browser Runner</name>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <developers>
         <developer>
             <id>monacotoni</id>
@@ -87,6 +87,20 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.3.7</version>
+                <configuration>
+                    <instructions>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Description>${project.name}</Bundle-Description>
+                        <Export-Package>net.java.html.junit</Export-Package>
+                    </instructions>
+                </configuration>
+                <extensions>true</extensions>
+            </plugin>
+            <plugin>
                 <groupId>org.netbeans.html</groupId>
                 <artifactId>html4j-maven-plugin</artifactId>
                 <version>${net.java.html.version}</version>
@@ -117,6 +131,50 @@
                     <junitArtifactName>com.dukescript.api:junit-osgi</junitArtifactName>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.19.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <junitArtifactName>com.dukescript.api:junit-osgi</junitArtifactName>
+                    <includes>
+                        <include>**/*Test</include>
+                    </includes>
+                    <systemProperties>
+                        <vmtest.precompiled>.*</vmtest.precompiled>
+                    </systemProperties>
+                    <additionalClasspathElements>
+                        <additionalClasspathElement>${project.build.directory}/${project.build.finalName}-bck2brwsr.jar</additionalClasspathElement>
+                    </additionalClasspathElements>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apidesign.bck2brwsr</groupId>
+                <artifactId>bck2brwsr-maven-plugin</artifactId>
+                <version>${bck2brwsr.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>library</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <ignoreBootClassPath>false</ignoreBootClassPath>
+                    <aotDeps>
+                        <aotDep>com.dukescript.api:junit-osgi</aotDep>
+                        <aotDep>org.apidesign.bck2brwsr:launcher.http</aotDep>
+                    </aotDeps>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
@@ -138,6 +196,13 @@
             <type>jar</type>
         </dependency>
         <dependency>
+            <groupId>org.apidesign.bck2brwsr</groupId>
+            <artifactId>launcher.http</artifactId>
+            <version>${bck2brwsr.version}</version>
+            <type>jar</type>
+        </dependency>
+
+        <dependency>
             <groupId>org.netbeans.html</groupId>
             <artifactId>net.java.html.boot.fx</artifactId>
             <version>${net.java.html.version}</version>
@@ -146,14 +211,8 @@
         </dependency>
         <dependency>
             <groupId>org.apidesign.bck2brwsr</groupId>
-            <artifactId>launcher</artifactId>
-            <version>${bck2brwsr.version}</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apidesign.bck2brwsr</groupId>
-            <artifactId>launcher.http</artifactId>
+            <artifactId>emul</artifactId>
+            <classifier>rt</classifier>
             <version>${bck2brwsr.version}</version>
             <type>jar</type>
             <scope>test</scope>
@@ -161,7 +220,14 @@
         <dependency>
             <groupId>org.apidesign.bck2brwsr</groupId>
             <artifactId>emul</artifactId>
-            <classifier>rt</classifier>
+            <version>${bck2brwsr.version}</version>
+            <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apidesign.bck2brwsr</groupId>
+            <artifactId>emul</artifactId>
+            <classifier>bck2brwsr</classifier>
             <version>${bck2brwsr.version}</version>
             <type>jar</type>
             <scope>test</scope>
