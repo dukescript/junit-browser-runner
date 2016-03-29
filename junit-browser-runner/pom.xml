@@ -176,6 +176,21 @@
                     </aotDeps>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.netbeans.tools</groupId>
+                <artifactId>sigtest-maven-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <packages>net.java.html.junit</packages>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
