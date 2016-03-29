@@ -18,9 +18,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.dukescript.api</groupId>
     <artifactId>junit-browser-runner</artifactId>
-    <name>JUnit Browser Runner</name>
     <version>1.0-SNAPSHOT</version>
+    <name>JUnit Browser Runner</name>
     <packaging>bundle</packaging>
+    <description>
+        JUnit extension that provides a runner to be used with
+        @RunWith annotation that executes DukeScript tests in
+        a browser.
+    </description>
+    <url>http://dukescript.com</url>
+
     <developers>
         <developer>
             <id>monacotoni</id>
@@ -77,6 +84,12 @@
         <developerConnection>scm:git:https://github.com/dukescript/junit-browser-runner.git</developerConnection>
         <tag>release-${releaseVersion}</tag>
     </scm>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <properties>
         <net.java.html.version>1.2.3</net.java.html.version>
@@ -249,4 +262,37 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <profiles>
+        <profile>
+            <id>junit-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <id>gpg-sign</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.3</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
