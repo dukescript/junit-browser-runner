@@ -229,6 +229,7 @@
             <artifactId>launcher.http</artifactId>
             <version>${bck2brwsr.version}</version>
             <type>jar</type>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
