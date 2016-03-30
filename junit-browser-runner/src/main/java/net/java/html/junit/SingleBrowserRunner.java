@@ -28,10 +28,17 @@ import org.junit.runners.model.InitializationError;
 final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
     private final AbstractTestRunner ctx;
     private final String browser;
+    private final String html;
     SingleBrowserRunner(String browser, AbstractTestRunner run, Class<?> klass) throws InitializationError {
         super(klass);
         this.browser = browser;
         this.ctx = run;
+        HTMLContent content = klass.getAnnotation(HTMLContent.class);
+        if (content != null) {
+            this.html = content.value();
+        } else {
+            this.html = null;
+        }
     }
 
     @Override
@@ -60,6 +67,9 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
         }
 
         final Object explosive(Object target, Object[] params) throws Throwable {
+            if (html != null) {
+                AbstractTestRunner.exposeHTML(html);
+            }
             return super.invokeExplosively(target, params);
         }
 

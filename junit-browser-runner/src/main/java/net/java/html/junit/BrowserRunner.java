@@ -73,7 +73,7 @@ public final class BrowserRunner extends Suite {
                 try (FileWriter w = new FileWriter(page)) {
                     w.write("<html>\n");
                     w.write("<body>\n");
-                    w.write(content.value());
+                    w.write("<h1>DukeScript JUnit Browser Runner</h1>\n");
                     w.write("</body>\n");
                     w.write("</html>\n");
                 }

@@ -46,23 +46,9 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
         return false;
     }
 
-    @JavaScriptBody(args = {"html"}, body
-        = "var element = document.getElementById('junit-browser-runner');\n"
-        + "if (!element) {\n"
-        + "  element = document.createElement('div');\n"
-        + "  element.id = 'junit-browser-runner';\n"
-        + "  document.body.appendChild(element);\n"
-        + "}\n"
-        + "element.innerHTML = html;\n"
-    )
-    private static native void exposeHTML(String html);
 
     static boolean register(List<AbstractTestRunner> ctxs, Class<?> clazzToTest) throws IOException {
         if (isInBrowser()) {
-            HTMLContent content = clazzToTest.getAnnotation(HTMLContent.class);
-            if (content != null) {
-                exposeHTML(content.value());
-            }
             ctxs.add(new Bck2BrwsrTestRunner());
             return true;
         }

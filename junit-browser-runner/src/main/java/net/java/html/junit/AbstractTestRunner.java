@@ -1,5 +1,7 @@
 package net.java.html.junit;
 
+import net.java.html.js.JavaScriptBody;
+
 /*
  * #%L
  * DukeScript JUnit Runner - a library from the DukeScript project.
@@ -16,6 +18,17 @@ package net.java.html.junit;
  */
 
 abstract class AbstractTestRunner {
+
+    @JavaScriptBody(args = {"html"}, body = ""
+        + "var element = document.getElementById('junit-browser-runner');\n"
+        + "if (!element) {\n" + "  element = document.createElement('div');\n"
+        + "  element.id = 'junit-browser-runner';\n"
+        + "  document.body.appendChild(element);\n"
+        + "}\n"
+        + "element.innerHTML = html;\n"
+    )
+    static native void exposeHTML(String html);
+    
     abstract String name();
     abstract void execute(Runnable run);
 }
