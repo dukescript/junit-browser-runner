@@ -46,6 +46,7 @@ final class PresenterTestRunner extends AbstractTestRunner {
             @Override
             public void run() {
                 ret[0] = BrwsrCtx.findDefault(klass);
+                JQuery2_2_2.SetupUI.init();
                 cdl.countDown();
             }
         }).loadPage(url);

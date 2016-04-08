@@ -29,6 +29,9 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
     private final AbstractTestRunner ctx;
     private final String browser;
     private final String html;
+    private TreeView treeView;
+    private int executed;
+    
     SingleBrowserRunner(String browser, AbstractTestRunner run, Class<?> klass) throws InitializationError {
         super(klass);
         this.browser = browser;
@@ -38,6 +41,9 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
             this.html = content.value();
         } else {
             this.html = null;
+        }
+        if (Bck2BrwsrTestRunner.isInBrowser()) {
+            executed = -1;
         }
     }
 
@@ -67,6 +73,17 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
         }
 
         final Object explosive(Object target, Object[] params) throws Throwable {
+            if (treeView == null && executed >= 0) {
+                final List<FrameworkMethod> methods = computeTestMethods();
+                String[] names = new String[methods.size()];
+                for (int i = 0; i < names.length; i++) {
+                    names[i] = methods.get(i).getName();
+                }
+                treeView = TreeView.create(getTestClass().getName(), names);
+            }
+            if (treeView != null) {
+                treeView.setValue(++executed);
+            }
             if (html != null) {
                 AbstractTestRunner.exposeHTML(html);
             }

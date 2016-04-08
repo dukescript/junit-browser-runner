@@ -1,8 +1,6 @@
 package net.java.html.junit;
 
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -49,19 +47,14 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
     }
 
     @JavaScriptBody(args = {}, body = "return document && document.getElementById ? true : false;")
-    private static boolean isInBrowser() {
+    static boolean isInBrowser() {
         return false;
     }
 
 
     static boolean register(List<AbstractTestRunner> ctxs, Class<?> clazzToTest) throws IOException {
         if (isInBrowser()) {
-            SetupUI.init(
-                    getImageURL("document.png"),
-                    getImageURL("toggle-small-expand.png"),
-                    getImageURL("folder-horizontal.png"),
-                    getImageURL("toggle-small.png"));
-
+            SetupUI.init();
             HTMLContent content = clazzToTest.getAnnotation(HTMLContent.class);
             if (content != null) {
                 exposeHTML(content.value());
@@ -184,14 +177,5 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
         }
     }
 
-    private static String getImageURL(String name) {
-        try {
-            URL u = Bck2BrwsrTestRunner.class.getResource(name);
-            URLConnection conn = u.openConnection();
-            return conn.getURL().toExternalForm();
-        } catch (IOException ex) {
-        }
-        return null;
-    }
 
 }
