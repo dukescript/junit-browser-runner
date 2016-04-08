@@ -24,7 +24,7 @@ import org.junit.runner.RunWith;
 public class SimpleJavaScriptTest {
     public SimpleJavaScriptTest() {
     }
-
+   
     @Test
     public void testInvocations() {
         assertEquals(33, constant());

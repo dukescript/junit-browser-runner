@@ -1,13 +1,20 @@
 package net.java.html.junit;
 
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import junit.framework.AssertionFailedError;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 import junit.framework.TestListener;
 import junit.framework.TestResult;
 import net.java.html.js.JavaScriptBody;
+import static net.java.html.junit.AbstractTestRunner.exposeHTML;
+import net.java.html.junit.JQuery2_2_2.SetupUI;
 import org.apidesign.bck2brwsr.launcher.InvocationContext;
 import org.apidesign.bck2brwsr.launcher.Launcher;
 import static org.junit.Assert.fail;
@@ -49,6 +56,16 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
 
     static boolean register(List<AbstractTestRunner> ctxs, Class<?> clazzToTest) throws IOException {
         if (isInBrowser()) {
+            SetupUI.init(
+                    getImageURL("document.png"),
+                    getImageURL("toggle-small-expand.png"),
+                    getImageURL("folder-horizontal.png"),
+                    getImageURL("toggle-small.png"));
+
+            HTMLContent content = clazzToTest.getAnnotation(HTMLContent.class);
+            if (content != null) {
+                exposeHTML(content.value());
+            }
             ctxs.add(new Bck2BrwsrTestRunner());
             return true;
         }
@@ -101,9 +118,33 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
         return runner;
     }
 
-    static void runAsJUnit(String className) throws ClassNotFoundException {
+    static void runAsJUnit(final String className) throws ClassNotFoundException {
         TestResult tr = new TestResult();
+        Class<?> clazz = Class.forName(className);
+        JUnit4TestAdapter suite = new JUnit4TestAdapter(clazz); 
+        Description description = suite.getDescription();
+        Description parent = description.getChildren().get(0);
+        ArrayList<Description> children1 = parent.getChildren();
+        String [] names = new String[children1.size()];
+        for (int i = 0; i < names.length; i++) {
+           names[i] = children1.get(i).getMethodName(); 
+        }
+        final TreeView treeview = TreeView.create(className, names);
+
+        treeview.setHandler_impl("rerun"+className, new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    BrowserRunner.execute(className);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(Bck2BrwsrTestRunner.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        
         class L implements TestListener {
+
+            int finished = 0;
 
             boolean error;
             StringBuilder sb = new StringBuilder();
@@ -123,6 +164,7 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
             @Override
             public void endTest(Test test) {
                 sb.append("finished: ").append(test.toString()).append("\n");;
+                treeview.setValue(++finished);
             }
 
             @Override
@@ -133,15 +175,23 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
         L listener = new L();
         tr.addListener(listener);
         listener.sb.append("Searching for ").append(className).append("\n");
-        Class<?> clazz = Class.forName(className);
         listener.sb.append("Starting the test ").append(clazz).append("\n");
-        JUnit4TestAdapter suite = new JUnit4TestAdapter(clazz);
         suite.run(tr);
         listener.sb.append("End of test run\n");
 
         if (listener.error) {
             fail(listener.sb.toString());
         }
+    }
+
+    private static String getImageURL(String name) {
+        try {
+            URL u = Bck2BrwsrTestRunner.class.getResource(name);
+            URLConnection conn = u.openConnection();
+            return conn.getURL().toExternalForm();
+        } catch (IOException ex) {
+        }
+        return null;
     }
 
 }
