@@ -90,7 +90,10 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
                     }
                     InvocationContext invocation = launcher.createInvocation(BrowserRunner.class, "execute");
                     invocation.setArguments(clazzToTest.getName());
-                    invocation.invoke();
+                    String result = invocation.invoke();
+                    if (result.contains("error:")) {
+                        notifier.fireTestFailure(new Failure(description, new Throwable(result)));
+                    }
                 } catch (IOException ex) {
                     notifier.fireTestFailure(new Failure(description, ex));
                 } finally {
@@ -110,24 +113,26 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
 
             @Override
             public void addError(Test test, Throwable e) {
-                sb.append("error: ").append(test.toString()).append("\n");
+                sb.append("error: ").append(test.toString());
+                sb.append(" message: ").append(e.getMessage());
+                sb.append("\n");
                 error = true;
             }
 
             @Override
             public void addFailure(Test test, AssertionFailedError e) {
-                sb.append("failure: ").append(test.toString()).append("\n");;
+                sb.append("error: ").append(test.toString());
+                sb.append(" message: ").append(e.getMessage());
+                sb.append("\n");
                 error = true;
             }
 
             @Override
             public void endTest(Test test) {
-                sb.append("finished: ").append(test.toString()).append("\n");;
             }
 
             @Override
             public void startTest(Test test) {
-                sb.append("started: ").append(test.toString()).append("\n");;
             }
         }
         L listener = new L();
