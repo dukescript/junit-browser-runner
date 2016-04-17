@@ -34,10 +34,10 @@ public final class BrowserRunner extends Suite {
         for (AbstractTestRunner info : create(klass)) {
             cases.add(new SingleBrowserRunner(info.name(), info, klass));
         }
+        Bck2BrwsrTestRunner.registerRunner(cases, klass);
         if (cases.isEmpty()) {
             throw new InitializationError("No presenter found. Add net.java.html.fx or script JAR on classpath!");
         }
-        Bck2BrwsrTestRunner.registerRunner(cases, klass);
     }
     @Override
     protected List<Runner> getChildren() {
