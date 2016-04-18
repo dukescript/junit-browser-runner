@@ -85,13 +85,13 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
                     if (sharedLauncher instanceof Launcher) {
                         launcher = (Launcher) sharedLauncher;
                     } else {
-                        sharedLauncher = launcher = Launcher.createBrowser(System.getProperty("junit.browser"));
+                        sharedLauncher = launcher = Launcher.createBrowser(System.getProperty("junit.browser"), null, "/net/java/html/junit/runner.html");
                         launcher.initialize();
                     }
                     InvocationContext invocation = launcher.createInvocation(BrowserRunner.class, "execute");
                     invocation.setArguments(clazzToTest.getName());
                     String result = invocation.invoke();
-                    if (result.contains("error:")) {
+                    if (result == null || result.contains("error:")) {
                         notifier.fireTestFailure(new Failure(description, new Throwable(result)));
                     }
                 } catch (IOException ex) {

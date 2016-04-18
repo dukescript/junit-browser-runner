@@ -93,7 +93,7 @@
 
     <properties>
         <net.java.html.version>1.2.3</net.java.html.version>
-        <bck2brwsr.version>0.18</bck2brwsr.version>
+        <bck2brwsr.version>1.0-SNAPSHOT</bck2brwsr.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <netbeans.compile.on.save>none</netbeans.compile.on.save>
