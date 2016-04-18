@@ -85,7 +85,7 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
                     if (sharedLauncher instanceof Launcher) {
                         launcher = (Launcher) sharedLauncher;
                     } else {
-                        sharedLauncher = launcher = Launcher.createBrowser(null);
+                        sharedLauncher = launcher = Launcher.createBrowser(System.getProperty("junit.browser"));
                         launcher.initialize();
                     }
                     InvocationContext invocation = launcher.createInvocation(BrowserRunner.class, "execute");
