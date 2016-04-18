@@ -1,8 +1,8 @@
 package net.java.html.junit;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -67,20 +67,9 @@ public final class BrowserRunner extends Suite {
                 return contexts;
             }
 
-            final File page = File.createTempFile("test", ".html");
-            HTMLContent content = klass.getAnnotation(HTMLContent.class);
-            if (content != null) {
-                try (FileWriter w = new FileWriter(page)) {
-                    w.write("<html>\n");
-                    w.write("<body>\n");
-                    w.write("<h1>DukeScript JUnit Browser Runner</h1>\n");
-                    w.write("</body>\n");
-                    w.write("</html>\n");
-                }
-            }
-            url = page.toURI().toASCIIString();
-            page.deleteOnExit();
-        } catch (IOException ex) {
+            URL resource = BrowserRunner.class.getResource("runner.html");
+            url = resource.toURI().toASCIIString();
+        } catch (IOException | URISyntaxException ex) {
             throw new InitializationError(ex);
         }
         PresenterTestRunner.registerPresenters(ctxs, url, klass);
