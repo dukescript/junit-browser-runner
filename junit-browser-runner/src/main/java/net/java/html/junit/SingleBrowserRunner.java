@@ -6,9 +6,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import org.junit.AssumptionViolatedException;
+import org.junit.runner.Description;
+import org.junit.runner.notification.Failure;
+import org.junit.runner.notification.RunNotifier;
+import org.junit.runner.notification.StoppedByUserException;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.Statement;
 
 /*
  * #%L
@@ -53,6 +59,47 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
     }
 
     @Override
+    public void run(final RunNotifier notifier) {
+        MultiNotifier testNotifier = new MultiNotifier(notifier,
+                getDescription());
+        try {
+            for (FrameworkMethod frameworkMethod : getChildren()) {
+                runChild(frameworkMethod, notifier);
+            }
+        } catch (AssumptionViolatedException e) {
+            testNotifier.addFailedAssumption(e);
+        } catch (StoppedByUserException e) {
+            throw e;
+        } catch (Throwable e) {
+            testNotifier.addFailure(e);
+        }
+    }
+
+    @Override
+    protected void runChild(final FrameworkMethod method, RunNotifier notifier) {
+        Description description = describeChild(method);
+        if (isIgnored(method)) {
+            notifier.fireTestIgnored(description);
+        } else {
+            try {
+                Object test = createTest(method);
+                Statement before = withBefores(method, test, EmptyStatement.EMPTY);
+                if (before != null) {
+                    before.evaluate();
+                }
+
+                method.invokeExplosively(test);
+
+                Statement after = withAfters(method, test, EmptyStatement.EMPTY);
+                if (after != null) {
+                    after.evaluate();
+                }
+            } catch (Throwable ex) {
+                notifier.fireTestFailure(new Failure(description, ex));
+            }
+        }
+    }
+    @Override
     protected void validateTestMethods(List<Throwable> errors) {
     }
 
@@ -70,7 +117,7 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
             if (html != null) {
                 AbstractTestRunner.exposeHTML(html);
             }
-            return super.invokeExplosively(target, params);
+            return getMethod().invoke(target, params);
         }
 
         @Override
@@ -124,6 +171,14 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
                 throw (Throwable)ex[0];
             }
             return null;
+        }
+    }
+
+    private static final class EmptyStatement extends Statement {
+        public static final Statement EMPTY = new EmptyStatement();
+
+        @Override
+        public void evaluate() throws Throwable {
         }
     }
 }

@@ -6,7 +6,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.junit.AssumptionViolatedException;
 import org.junit.runner.Runner;
+import org.junit.runner.notification.RunNotifier;
+import org.junit.runner.notification.StoppedByUserException;
 import org.junit.runners.Suite;
 import org.junit.runners.model.InitializationError;
 
@@ -42,6 +45,23 @@ public final class BrowserRunner extends Suite {
     @Override
     protected List<Runner> getChildren() {
         return cases;
+    }
+
+    @Override
+    public void run(final RunNotifier notifier) {
+        MultiNotifier testNotifier = new MultiNotifier(notifier,
+                getDescription());
+        try {
+            for (Runner each : getChildren()) {
+                each.run(notifier);
+            }
+        } catch (AssumptionViolatedException e) {
+            testNotifier.addFailedAssumption(e);
+        } catch (StoppedByUserException e) {
+            throw e;
+        } catch (Throwable e) {
+            testNotifier.addFailure(e);
+        }
     }
 
     /** Loads given class and executes its tests.
