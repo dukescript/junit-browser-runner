@@ -1,11 +1,9 @@
 package net.java.html.junit;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import org.junit.AssumptionViolatedException;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
@@ -32,13 +30,13 @@ import org.junit.runners.model.Statement;
  */
 
 final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
-    private final AbstractTestRunner ctx;
+    private final AbstractTestRunner schedule;
     private final String browser;
     private final String html;
     SingleBrowserRunner(String browser, AbstractTestRunner run, Class<?> klass) throws InitializationError {
         super(klass);
         this.browser = browser;
-        this.ctx = run;
+        this.schedule = run;
         HTMLContent content = klass.getAnnotation(HTMLContent.class);
         if (content != null) {
             this.html = content.value();
@@ -76,7 +74,8 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
     }
 
     @Override
-    protected void runChild(final FrameworkMethod method, RunNotifier notifier) {
+    protected void runChild(FrameworkMethod m, RunNotifier notifier) {
+        InBrowserMethod method = (InBrowserMethod) m;
         Description description = describeChild(method);
         if (isIgnored(method)) {
             notifier.fireTestIgnored(description);
@@ -84,16 +83,8 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
             try {
                 Object test = createTest(method);
                 Statement before = withBefores(method, test, EmptyStatement.EMPTY);
-                if (before != null) {
-                    before.evaluate();
-                }
-
-                method.invokeExplosively(test);
-
                 Statement after = withAfters(method, test, EmptyStatement.EMPTY);
-                if (after != null) {
-                    after.evaluate();
-                }
+                method.invokeInSteps(notifier, description, before, test, new Object[0], after);
             } catch (Throwable ex) {
                 notifier.fireTestFailure(new Failure(description, ex));
             }
@@ -120,14 +111,71 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
             return getMethod().invoke(target, params);
         }
 
-        @Override
-        public Object invokeExplosively(final Object target, final Object... params) throws Throwable {
-            final CountDownLatch cdl = new CountDownLatch(1);
-            final Object[] ex = { null };
-            final List<Runnable> delayed = new ArrayList<>();
-            ctx.execute(new Runnable() {
+        void invokeInSteps(
+            final RunNotifier notifier,
+            final Description description,
+            final Statement before,
+            final Object target,
+            final Object[] params,
+            final Statement after
+        ) {
+            notifier.fireTestStarted(description);
+            if (before != null) {
+                schedule.invokeNow(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            before.evaluate();
+                        } catch (Throwable ex) {
+                            notifier.fireTestFailure(new Failure(description, ex));
+                        }
+                    }
+                });
+            }
+
+
+            class DelayedAndAfter implements Runnable {
+                private final List<Runnable> delayed;
+                private int at;
+                private Statement atEnd = after;
+                DelayedAndAfter(List<Runnable> delayed) {
+                    this.delayed = delayed;
+                    this.at = 0;
+                }
+
                 @Override
                 public void run() {
+                    if (at < delayed.size()) {
+                        try {
+                            delayed.get(at++).run();
+                        } catch (Throwable t) {
+                            at = delayed.size();
+                            notifier.fireTestFailure(new Failure(description, t));
+                        } finally {
+                            schedule.invokeLater(this);
+                        }
+                        return;
+                    }
+                    if (atEnd != null) {
+                        schedule.invokeLater(this);
+                        try {
+                            atEnd.evaluate();
+                        } catch (Throwable t) {
+                            notifier.fireTestAssumptionFailed(new Failure(description, t));
+                        } finally {
+                            atEnd = null;
+                        }
+                        return;
+                    }
+                    notifier.fireTestFinished(description);
+                }
+            }
+
+            final Object[] ex = { null };
+            schedule.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    final List<Runnable> delayed = new ArrayList<>();
                     try {
                         Object ret = explosive(target, params);
                         if (ret instanceof Runnable) {
@@ -137,40 +185,11 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
                             delayed.addAll(Arrays.asList(((Runnable[]) ret)));
                         }
                     } catch (Throwable t) {
-                        ex[0] = t;
-                    } finally {
-                        cdl.countDown();
+                        notifier.fireTestFailure(new Failure(description, t));
                     }
+                    schedule.invokeLater(new DelayedAndAfter(delayed));
                 }
             });
-            cdl.await();
-            for (final Runnable r : delayed) {
-                Thread.sleep(100);
-                if (ex[0] != null) {
-                    break;
-                }
-                final CountDownLatch rDown = new CountDownLatch(1);
-                ctx.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            r.run();
-                        } catch (Throwable t) {
-                            ex[0] = t;
-                        } finally {
-                            rDown.countDown();
-                        }
-                    }
-                });
-                rDown.await();
-            }
-            if (ex[0] instanceof Throwable) {
-                if  (ex[0] instanceof InvocationTargetException) {
-                    throw ((InvocationTargetException)ex[0]).getTargetException();
-                }
-                throw (Throwable)ex[0];
-            }
-            return null;
         }
     }
 

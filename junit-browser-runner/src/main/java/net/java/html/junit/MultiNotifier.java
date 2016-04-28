@@ -1,7 +1,10 @@
 package net.java.html.junit;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.runner.Description;
+import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.MultipleFailureException;
@@ -21,14 +24,16 @@ import org.junit.runners.model.MultipleFailureException;
  * #L%
  */
 
-final class MultiNotifier {
+final class MultiNotifier extends RunNotifier {
     private final RunNotifier notifier;
 
     private final Description description;
+    private final Set<Description> remaining;
 
     public MultiNotifier(RunNotifier notifier, Description description) {
         this.notifier = notifier;
         this.description = description;
+        this.remaining = new HashSet<>();
     }
 
     public void addFailure(Throwable targetException) {
@@ -47,17 +52,75 @@ final class MultiNotifier {
 
     public void addFailedAssumption(AssumptionViolatedException e) {
         notifier.fireTestAssumptionFailed(new Failure(description, e));
+        finishTest(description);
     }
 
     public void fireTestFinished() {
         notifier.fireTestFinished(description);
+        finishTest(description);
     }
 
-    public void fireTestStarted() {
+    @Override
+    public void fireTestStarted(Description descr) {
+        registerTest(descr);
         notifier.fireTestStarted(description);
     }
 
     public void fireTestIgnored() {
         notifier.fireTestIgnored(description);
+        finishTest(description);
+    }
+
+    @Override
+    public void fireTestFinished(Description description) {
+        notifier.fireTestFinished(description);
+        finishTest(description);
+    }
+
+    @Override
+    public void fireTestIgnored(Description description) {
+        notifier.fireTestIgnored(description);
+        finishTest(description);
+    }
+
+    @Override
+    public void fireTestAssumptionFailed(Failure failure) {
+        notifier.fireTestAssumptionFailed(failure);
+        finishTest(description);
+    }
+
+    @Override
+    public void fireTestFailure(Failure failure) {
+        notifier.fireTestFailure(failure);
+        finishTest(failure.getDescription());
+    }
+
+    @Override
+    public void fireTestRunFinished(Result result) {
+        notifier.fireTestRunFinished(result);
+    }
+
+    @Override
+    public void fireTestRunStarted(Description description) {
+        notifier.fireTestRunStarted(description);
+        registerTest(description);
+    }
+
+
+    private synchronized void registerTest(Description descr) {
+        remaining.add(descr);
+    }
+
+    synchronized void waitForAll() throws InterruptedException {
+        while (!remaining.isEmpty()) {
+            wait();
+        }
+    }
+
+   private synchronized void finishTest(Description descr) {
+        remaining.remove(descr);
+        if (remaining.isEmpty()) {
+            notifyAll();
+        }
     }
 }

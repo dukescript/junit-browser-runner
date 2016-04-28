@@ -30,5 +30,6 @@ abstract class AbstractTestRunner {
     static native void exposeHTML(String html);
     
     abstract String name();
-    abstract void execute(Runnable run);
+    abstract void invokeLater(Runnable run);
+    abstract void invokeNow(Runnable runnable);
 }

@@ -10,11 +10,11 @@ import junit.framework.TestResult;
 import net.java.html.js.JavaScriptBody;
 import org.apidesign.bck2brwsr.launcher.InvocationContext;
 import org.apidesign.bck2brwsr.launcher.Launcher;
-import static org.junit.Assert.fail;
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
+import static org.junit.Assert.fail;
 /*
  * #%L
  * DukeScript JUnit Runner - a library from the DukeScript project.
@@ -36,9 +36,22 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
         return "Bck2Brwsr";
     }
 
+    @JavaScriptBody(args = { "run", "timeout" }, javacall = true, body = ""
+        + "window.setTimeout(function() {\n"
+        + "  run.@java.lang.Runnable::run()();\n"
+        + "}, timeout);\n"
+        + ""
+    )
+    private static native void setTimeout(Runnable run, int timeout);
+
     @Override
-    void execute(Runnable run) {
-        run.run();
+    void invokeLater(Runnable run) {
+        setTimeout(run, 100);
+    }
+
+    @Override
+    void invokeNow(Runnable run) {
+        setTimeout(run, 1);
     }
 
     @JavaScriptBody(args = {}, body = "return document && document.getElementById ? true : false;")

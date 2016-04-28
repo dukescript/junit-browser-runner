@@ -2,6 +2,8 @@ package net.java.html.junit;
 
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import net.java.html.BrwsrCtx;
@@ -25,6 +27,7 @@ import org.netbeans.html.boot.spi.Fn;
  */
 
 final class PresenterTestRunner extends AbstractTestRunner {
+    private static final Timer TIMER = new Timer("Invoke Later");
     final String name;
     final BrwsrCtx ctx;
 
@@ -64,8 +67,23 @@ final class PresenterTestRunner extends AbstractTestRunner {
     }
 
     @Override
-    void execute(Runnable run) {
-        ctx.execute(run);
+    void invokeNow(final Runnable run) {
+        TIMER.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                ctx.execute(run);
+            }
+        }, 1);
+    }
+
+    @Override
+    void invokeLater(final Runnable run) {
+        TIMER.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                ctx.execute(run);
+            }
+        }, 100);
     }
 
     @Override

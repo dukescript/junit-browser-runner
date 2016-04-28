@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.AssumptionViolatedException;
 import org.junit.runner.Runner;
+import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runner.notification.StoppedByUserException;
 import org.junit.runners.Suite;
@@ -49,11 +50,21 @@ public final class BrowserRunner extends Suite {
 
     @Override
     public void run(final RunNotifier notifier) {
-        MultiNotifier testNotifier = new MultiNotifier(notifier,
-                getDescription());
+        try {
+            MultiNotifier testNotifier = new MultiNotifier(
+                notifier, getDescription()
+            );
+            runNoWait(testNotifier);
+            testNotifier.waitForAll();
+        } catch (InterruptedException ex) {
+            notifier.fireTestFailure(new Failure(getDescription(), ex));
+        }
+    }
+
+    private void runNoWait(MultiNotifier testNotifier) {
         try {
             for (Runner each : getChildren()) {
-                each.run(notifier);
+                each.run(testNotifier);
             }
         } catch (AssumptionViolatedException e) {
             testNotifier.addFailedAssumption(e);
