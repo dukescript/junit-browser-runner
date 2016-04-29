@@ -92,8 +92,8 @@
     </distributionManagement>
 
     <properties>
-        <net.java.html.version>1.2.3</net.java.html.version>
-        <bck2brwsr.version>1.0-SNAPSHOT</bck2brwsr.version>
+        <net.java.html.version>1.3</net.java.html.version>
+        <bck2brwsr.version>0.19</bck2brwsr.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <netbeans.compile.on.save>none</netbeans.compile.on.save>
@@ -233,6 +233,8 @@
             <version>${net.java.html.version}</version>
             <type>jar</type>
         </dependency>
+
+        <!-- need to be included by the user to turn bck2brwsr support on -->
         <dependency>
             <groupId>org.apidesign.bck2brwsr</groupId>
             <artifactId>launcher.http</artifactId>
@@ -241,33 +243,29 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.netbeans.html</groupId>
-            <artifactId>net.java.html.boot.fx</artifactId>
-            <version>${net.java.html.version}</version>
-            <type>jar</type>
-            <scope>test</scope>
-        </dependency>
+        <!-- these libraries are made available to simplify configuration -->
         <dependency>
             <groupId>org.apidesign.bck2brwsr</groupId>
             <artifactId>emul</artifactId>
             <classifier>rt</classifier>
             <version>${bck2brwsr.version}</version>
             <type>jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apidesign.bck2brwsr</groupId>
-            <artifactId>emul</artifactId>
-            <version>${bck2brwsr.version}</version>
-            <type>jar</type>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.apidesign.bck2brwsr</groupId>
             <artifactId>emul</artifactId>
             <classifier>bck2brwsr</classifier>
             <version>${bck2brwsr.version}</version>
+            <type>jar</type>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- only needed by a test -->
+        <dependency>
+            <groupId>org.netbeans.html</groupId>
+            <artifactId>net.java.html.boot.fx</artifactId>
+            <version>${net.java.html.version}</version>
             <type>jar</type>
             <scope>test</scope>
         </dependency>
