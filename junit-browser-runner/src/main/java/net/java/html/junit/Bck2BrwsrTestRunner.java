@@ -127,9 +127,18 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
             log("Starting the test", clazz);
         }
 
-        private final void log(String msg, Object param) {
-            System.err.println(msg + param);
-            sb.append(msg).append(" ").append(param).append("\n");
+        private final void log(String msg, Object... param) {
+            StringBuilder text = new StringBuilder(msg);
+            for (Object p : param) {
+                text.append(' ').append(p);
+            }
+            text.append('\n');
+            System.err.println(text.toString());
+            sb.append(text.toString());
+        }
+
+        @JavaScriptBody(args = {  }, body = "debugger;")
+        private static void debug() {
         }
 
         @Override
@@ -141,12 +150,14 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
         public void testAssumptionFailure(Failure failure) {
             log("testAssumptionFailure", failure);
             error = true;
+            debug();
         }
 
         @Override
         public void testFailure(Failure failure) throws Exception {
-            log("testFailure", failure);
+            log("testFailure", failure.getDescription(), failure.getMessage());
             error = true;
+            debug();
         }
 
         @Override
@@ -156,7 +167,7 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
 
         @Override
         public void testStarted(Description description) throws Exception {
-            log("testStarted", description);
+            log("testStarted", description.getClassName(), description.getMethodName());
         }
 
         @Override
@@ -182,6 +193,9 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
                 notifier.waitForAll();
             }
             log("End of test run", clazz);
+        }
+        
+        public void assertResult() {
             if (error) {
                 fail(sb.toString());
             }
@@ -189,13 +203,15 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
     }
     private static TestListener listener;
     static void runAsJUnit(String className) throws ClassNotFoundException, InterruptedException {
-        if (listener == null) {
-            listener = new TestListener(className);
-            listener.start();
+        TestListener l = listener;
+        if (l == null) {
+            listener = l = new TestListener(className);
+            l.start();
         } else {
-            listener.waitForAll();
-            listener = null;
+            l.waitForAll();
         }
+        listener = null;
+        l.assertResult();
     }
 
 }

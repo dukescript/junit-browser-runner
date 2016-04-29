@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.AssumptionViolatedException;
 import org.junit.runner.Runner;
-import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runner.notification.StoppedByUserException;
 import org.junit.runners.Suite;
@@ -57,8 +56,12 @@ public final class BrowserRunner extends Suite {
             runNoWait(testNotifier);
             testNotifier.waitForAll();
         } catch (InterruptedException ex) {
-            notifier.fireTestFailure(new Failure(getDescription(), ex));
+            throw rethrow(RuntimeException.class, ex);
         }
+    }
+
+    private static <E extends Exception> E rethrow(Class<E> type, Exception ex) throws E {
+        throw (E)ex;
     }
 
     private void runNoWait(MultiNotifier testNotifier) {
