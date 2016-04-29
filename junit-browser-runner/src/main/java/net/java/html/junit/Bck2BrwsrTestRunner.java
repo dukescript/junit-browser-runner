@@ -2,18 +2,16 @@ package net.java.html.junit;
 
 import java.io.IOException;
 import java.util.List;
-import junit.framework.AssertionFailedError;
-import junit.framework.JUnit4TestAdapter;
-import junit.framework.Test;
-import junit.framework.TestListener;
-import junit.framework.TestResult;
 import net.java.html.js.JavaScriptBody;
 import org.apidesign.bck2brwsr.launcher.InvocationContext;
 import org.apidesign.bck2brwsr.launcher.Launcher;
 import static org.junit.Assert.fail;
 import org.junit.runner.Description;
+import org.junit.runner.Request;
+import org.junit.runner.Result;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.Failure;
+import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 /*
  * #%L
@@ -104,49 +102,76 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
         return runner;
     }
 
+    private static final class TestListener extends RunListener {
+        private final StringBuilder sb = new StringBuilder();
+        private final Class<?> clazz;
+        boolean error;
+
+        private TestListener(String className) throws ClassNotFoundException {
+            log("Searching for", className);
+            clazz = Class.forName(className);
+            log("Starting the test", clazz);
+        }
+
+        private final void log(String msg, Object param) {
+            System.err.println(msg + param);
+            sb.append(msg).append(" ").append(param).append("\n");
+        }
+
+        @Override
+        public void testIgnored(Description description) throws Exception {
+            log("testIgnored", description);
+        }
+
+        @Override
+        public void testAssumptionFailure(Failure failure) {
+            log("testAssumptionFailure", failure);
+            error = true;
+        }
+
+        @Override
+        public void testFailure(Failure failure) throws Exception {
+            log("testFailure", failure);
+            error = true;
+        }
+
+        @Override
+        public void testFinished(Description description) throws Exception {
+            log("testFinished", description);
+        }
+
+        @Override
+        public void testStarted(Description description) throws Exception {
+            log("testStarted", description);
+        }
+
+        @Override
+        public void testRunFinished(Result result) throws Exception {
+            log("testRunFinished", result);
+        }
+
+        @Override
+        public void testRunStarted(Description description) throws Exception {
+            log("testRunStarted", description);
+        }
+
+        public void start() {
+            Request request = Request.aClass(clazz);
+            Runner runner = request.getRunner();
+            RunNotifier notifier = new RunNotifier();
+            notifier.addListener(this);
+            runner.run(notifier);
+
+            log("End of test run", clazz);
+
+            if (error) {
+                fail(sb.toString());
+            }
+        }
+    }
     static void runAsJUnit(String className) throws ClassNotFoundException {
-        TestResult tr = new TestResult();
-        class L implements TestListener {
-
-            boolean error;
-            StringBuilder sb = new StringBuilder();
-
-            @Override
-            public void addError(Test test, Throwable e) {
-                sb.append("error: ").append(test.toString());
-                sb.append(" message: ").append(e.getMessage());
-                sb.append("\n");
-                error = true;
-            }
-
-            @Override
-            public void addFailure(Test test, AssertionFailedError e) {
-                sb.append("error: ").append(test.toString());
-                sb.append(" message: ").append(e.getMessage());
-                sb.append("\n");
-                error = true;
-            }
-
-            @Override
-            public void endTest(Test test) {
-            }
-
-            @Override
-            public void startTest(Test test) {
-            }
-        }
-        L listener = new L();
-        tr.addListener(listener);
-        listener.sb.append("Searching for ").append(className).append("\n");
-        Class<?> clazz = Class.forName(className);
-        listener.sb.append("Starting the test ").append(clazz).append("\n");
-        JUnit4TestAdapter suite = new JUnit4TestAdapter(clazz);
-        suite.run(tr);
-        listener.sb.append("End of test run\n");
-
-        if (listener.error) {
-            fail(listener.sb.toString());
-        }
+        TestListener listener = new TestListener(className);
+        listener.start();
     }
 
 }
