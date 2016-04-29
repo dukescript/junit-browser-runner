@@ -21,8 +21,11 @@ import org.junit.runner.RunWith;
 
 @RunWith(BrowserRunner.class)
 public class FailInBrowser {
-    @Test
     @JavaScriptBody(args = {}, body = "throw 'Simulate a failure';")
-    public void failInBrowser() {
+    private static native void throwFailure();
+
+    @Test
+    public void failInBrowser() throws Exception {
+        throwFailure();
     }
 }

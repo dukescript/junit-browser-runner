@@ -1,5 +1,6 @@
 package net.java.html.junit;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,7 +59,7 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
 
     @Override
     public void run(final RunNotifier notifier) {
-        MultiNotifier testNotifier = new MultiNotifier(notifier,
+        MultiNotifier testNotifier = MultiNotifier.wrap(notifier,
                 getDescription());
         try {
             for (FrameworkMethod frameworkMethod : getChildren()) {
@@ -185,6 +186,9 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
                             delayed.addAll(Arrays.asList(((Runnable[]) ret)));
                         }
                     } catch (Throwable t) {
+                        if (t instanceof InvocationTargetException) {
+                            t = t.getCause();
+                        }
                         notifier.fireTestFailure(new Failure(description, t));
                     }
                     schedule.invokeLater(new DelayedAndAfter(delayed));

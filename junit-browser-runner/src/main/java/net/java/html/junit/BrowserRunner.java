@@ -51,7 +51,7 @@ public final class BrowserRunner extends Suite {
     @Override
     public void run(final RunNotifier notifier) {
         try {
-            MultiNotifier testNotifier = new MultiNotifier(
+            MultiNotifier testNotifier = MultiNotifier.wrap(
                 notifier, getDescription()
             );
             runNoWait(testNotifier);
@@ -80,7 +80,7 @@ public final class BrowserRunner extends Suite {
      * @param className the class name
      * @throws java.lang.ClassNotFoundException if the class cannot be loaded
      */
-    public static void execute(String className) throws ClassNotFoundException {
+    public static void execute(String className) throws ClassNotFoundException, InterruptedException {
         Bck2BrwsrTestRunner.runAsJUnit(className);
     }
 

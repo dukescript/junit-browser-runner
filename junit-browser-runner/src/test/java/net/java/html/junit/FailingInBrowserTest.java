@@ -20,7 +20,7 @@ import org.junit.Test;
 
 public class FailingInBrowserTest {
     @Test
-    public void runAndFail() throws ClassNotFoundException {
+    public void runAndFail() throws ClassNotFoundException, InterruptedException {
         try {
             BrowserRunner.execute(FailInBrowser.class.getName());
         } catch (AssertionError ex) {

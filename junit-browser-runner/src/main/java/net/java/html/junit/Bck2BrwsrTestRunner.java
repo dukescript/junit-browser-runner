@@ -118,6 +118,7 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
     private static final class TestListener extends RunListener {
         private final StringBuilder sb = new StringBuilder();
         private final Class<?> clazz;
+        private MultiNotifier notifier;
         boolean error;
 
         private TestListener(String className) throws ClassNotFoundException {
@@ -168,23 +169,33 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
             log("testRunStarted", description);
         }
 
-        public void start() {
+        public void start() throws InterruptedException {
             Request request = Request.aClass(clazz);
             Runner runner = request.getRunner();
-            RunNotifier notifier = new RunNotifier();
-            notifier.addListener(this);
+            notifier = new MultiNotifier(this, runner.getDescription());
             runner.run(notifier);
+            waitForAll();
+        }
 
+        public void waitForAll() throws InterruptedException {
+            if (notifier != null) {
+                notifier.waitForAll();
+            }
             log("End of test run", clazz);
-
             if (error) {
                 fail(sb.toString());
             }
         }
     }
-    static void runAsJUnit(String className) throws ClassNotFoundException {
-        TestListener listener = new TestListener(className);
-        listener.start();
+    private static TestListener listener;
+    static void runAsJUnit(String className) throws ClassNotFoundException, InterruptedException {
+        if (listener == null) {
+            listener = new TestListener(className);
+            listener.start();
+        } else {
+            listener.waitForAll();
+            listener = null;
+        }
     }
 
 }

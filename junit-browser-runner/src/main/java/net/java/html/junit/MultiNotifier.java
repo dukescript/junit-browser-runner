@@ -6,6 +6,7 @@ import org.junit.internal.AssumptionViolatedException;
 import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
+import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.MultipleFailureException;
 
@@ -30,10 +31,26 @@ final class MultiNotifier extends RunNotifier {
     private final Description description;
     private final Set<Description> remaining;
 
-    public MultiNotifier(RunNotifier notifier, Description description) {
+    private MultiNotifier(RunNotifier notifier, Description description) {
         this.notifier = notifier;
         this.description = description;
         this.remaining = new HashSet<>();
+    }
+
+    MultiNotifier(RunListener listener, Description description) {
+        RunNotifier run = new RunNotifier();
+        run.addListener(listener);
+        this.notifier = run;
+        this.description = description;
+        this.remaining = new HashSet<>();
+    }
+
+    static MultiNotifier wrap(RunNotifier notifier, Description description) {
+        if (notifier instanceof MultiNotifier) {
+            MultiNotifier prev = (MultiNotifier) notifier;
+            return prev;
+        }
+        return new MultiNotifier(notifier, description);
     }
 
     public void addFailure(Throwable targetException) {
