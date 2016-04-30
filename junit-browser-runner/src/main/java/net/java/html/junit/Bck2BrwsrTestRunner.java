@@ -137,47 +137,41 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
             sb.append(text.toString());
         }
 
-        @JavaScriptBody(args = {  }, body = "debugger;")
-        private static void debug() {
-        }
-
         @Override
         public void testIgnored(Description description) throws Exception {
-            log("testIgnored", description);
+            log("ignored:", description);
         }
 
         @Override
         public void testAssumptionFailure(Failure failure) {
-            log("testAssumptionFailure", failure);
+            log("error:", failure);
             error = true;
-            debug();
         }
 
         @Override
         public void testFailure(Failure failure) throws Exception {
-            log("testFailure", failure.getDescription(), failure.getMessage());
+            log("error:", failure.getDescription(), failure.getMessage());
             error = true;
-            debug();
         }
 
         @Override
         public void testFinished(Description description) throws Exception {
-            log("testFinished", description);
+            log("finished:", description);
         }
 
         @Override
         public void testStarted(Description description) throws Exception {
-            log("testStarted", description.getClassName(), description.getMethodName());
+            log("started:", description.getClassName(), description.getMethodName());
         }
 
         @Override
         public void testRunFinished(Result result) throws Exception {
-            log("testRunFinished", result);
+            log("executed", result.getRunCount(), "tests", "in", result.getRunTime(), "ms", result.getFailureCount(), "failures");
         }
 
         @Override
         public void testRunStarted(Description description) throws Exception {
-            log("testRunStarted", description);
+            log("starting:", description.getDisplayName());
         }
 
         public void start() throws InterruptedException {
