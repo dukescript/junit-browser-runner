@@ -12,7 +12,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
-  <name>junitonline JavaScript Libraries</name>
+  <name>JUnit On-line Javac Integration</name>
 
   <properties>
     <netbeans.compile.on.save>none</netbeans.compile.on.save>
@@ -79,6 +79,30 @@
                   <obfuscation>NONE</obfuscation>
               </configuration>
           </plugin>
+          <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>exec-maven-plugin</artifactId>
+              <version>1.2.1</version>
+              <executions>
+                  <execution>
+                      <id>generate-packages</id>
+                      <phase>process-classes</phase>
+                      <configuration>
+                          <executable>java</executable>
+                          <arguments>
+                              <argument>-Dskip.if.exists=true</argument>
+                              <argument>-cp</argument>
+                              <classpath />
+                              <argument>com.dukescript.app.junitonline.javac.ClassLoaderFileManager</argument>
+                              <argument>${project.build.directory}/classes/com/dukescript/app/junitonline/javac/</argument>
+                          </arguments>
+                      </configuration>
+                      <goals>
+                          <goal>exec</goal>
+                      </goals>
+                  </execution>
+              </executions>
+          </plugin>
       </plugins>
   </build>
   <dependencies>
@@ -100,7 +124,16 @@
         <type>jar</type>
     </dependency>
 
-    <!-- Nashorn presenter for BrowserRunner -->
+    <!-- JavaFX presenter for BrowserRunner -->
+    <dependency>
+      <groupId>org.netbeans.html</groupId>
+      <artifactId>net.java.html.boot.fx</artifactId>
+      <version>${net.java.html.version}</version>
+      <scope>test</scope>
+      <type>jar</type>
+    </dependency>
+    
+    <!-- Nashorn presenter for BrowserRunner
     <dependency>
       <groupId>org.netbeans.html</groupId>
       <artifactId>net.java.html.boot.script</artifactId>
@@ -108,6 +141,7 @@
       <scope>test</scope>
       <type>jar</type>
     </dependency>
+    -->
 
     <!-- Bck2Brwsr VM presenter for BrowserRunner ...
     <dependency>
@@ -134,5 +168,27 @@
         <type>jar</type>
     </dependency>
     ... End of Bck2Brwsr VM presenter for BrowserRunner -->
+    <dependency>
+      <groupId>org.netbeans.html</groupId>
+      <artifactId>net.java.html.json</artifactId>
+      <version>${net.java.html.version}</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>javacapi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>javacimpl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apidesign.bck2brwsr</groupId>
+      <artifactId>emul</artifactId>
+      <version>${bck2brwsr.version}</version>
+      <classifier>rt</classifier>
+    </dependency>
   </dependencies>
 </project>

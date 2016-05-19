@@ -39,17 +39,76 @@
  *
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
-package com.dukescript.app.junitonline.js;
+package com.dukescript.app.junitonline.javac;
 
-import net.java.html.js.JavaScriptBody;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 
-/** Use {@link JavaScriptBody} annotation on methods to
- * directly interact with JavaScript. See
- * http://bits.netbeans.org/html+java/1.2/net/java/html/js/package-summary.html
- * to understand how.
+/**
+ *
+ * @author Tomas Zezula
  */
-public final class Dialogs {
-    private Dialogs() {
+class ClassLoaderJavaFileObject extends BaseFileObject {
+
+    ClassLoaderJavaFileObject(final String path) {
+        super(path, getKind(path));
     }
-    
+
+    @Override
+    public InputStream openInputStream() throws IOException {
+        final InputStream in = getClass().getClassLoader().getResourceAsStream(path);
+        if (in == null) {
+            throw new FileNotFoundException(path);
+        }
+        return in;
+    }
+
+    @Override
+    public OutputStream openOutputStream() throws IOException {
+        throw new UnsupportedOperationException("Read Only FileObject");    //NOI18N
+    }
+
+    @Override
+    public Reader openReader(boolean ignoreEncodingErrors) throws IOException {
+        return new InputStreamReader(openInputStream());
+    }
+
+    @Override
+    public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
+        final BufferedReader in = new BufferedReader(openReader(ignoreEncodingErrors));
+        try {
+            final StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = in.readLine()) != null) {
+                sb.append(line);
+                sb.append('\n');    //NOI18N
+            }
+            return sb.toString();
+        } finally {
+            in.close();
+        }
+    }
+
+    @Override
+    public Writer openWriter() throws IOException {
+        return new OutputStreamWriter(openOutputStream());
+    }
+
+    @Override
+    public long getLastModified() {
+        return System.currentTimeMillis();
+    }
+
+    @Override
+    public boolean delete() {
+        return false;
+    }
+
 }

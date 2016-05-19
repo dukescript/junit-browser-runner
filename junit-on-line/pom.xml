@@ -16,12 +16,15 @@
         <module>client-android</module>
         <module>client-ios</module>
         <module>js</module>
+        <module>javacapi</module>
+        <module>javacimpl</module>
     </modules>
     <properties>
         <net.java.html.version>1.3</net.java.html.version>
         <bck2brwsr.version>0.19</bck2brwsr.version>
         <bck2brwsr.obfuscationlevel>MINIMAL</bck2brwsr.obfuscationlevel>
         <junit.browser.version>0.7</junit.browser.version>
+        <netbeans.version>RELEASE81</netbeans.version>
         <jersey.version>2.13</jersey.version>
         <enforcer.fail>false</enforcer.fail>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

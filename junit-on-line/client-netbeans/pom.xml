@@ -17,7 +17,6 @@
     <name>junitonline Client for NetBeans</name>
 
     <properties>
-        <netbeans.version>RELEASE81</netbeans.version>
         <netbeans.compile.on.save>none</netbeans.compile.on.save>
         <project.mainclass>com.dukescript.app.junitonline.NbMain</project.mainclass>
     </properties>

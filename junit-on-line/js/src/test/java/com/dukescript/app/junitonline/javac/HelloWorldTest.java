@@ -39,17 +39,46 @@
  *
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
-package com.dukescript.app.junitonline.js;
+package com.dukescript.app.junitonline.javac;
 
-import net.java.html.js.JavaScriptBody;
+import java.io.IOException;
+import java.util.List;
+import net.java.html.junit.BrowserRunner;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-/** Use {@link JavaScriptBody} annotation on methods to
- * directly interact with JavaScript. See
- * http://bits.netbeans.org/html+java/1.2/net/java/html/js/package-summary.html
- * to understand how.
- */
-public final class Dialogs {
-    private Dialogs() {
+
+@RunWith(BrowserRunner.class)
+public class HelloWorldTest {
+
+    @Test
+    public int testCompile() throws IOException {
+        String html = "";
+        String java = "package x.y.z;"
+                + "class X {"
+                + "   static void main(String... args) { throw new RuntimeException(\"Hello World!\"); }"
+                + "}";
+        JavacResult result = JavacEndpoint.newCompiler().doCompile(
+            new JavacQuery(JavacEndpoint.MsgType.compile, null, html, java, 0)
+        );
+        assertNotNull(result, "Null result");
+
+        List<JavacClass> classes = result.getClasses();
+        if (classes.size() > 0) {
+            JavacClass clazz = classes.get(0);
+            assertNotNull(clazz, "Null class");
+            List<Byte> byteCode = clazz.getByteCode();
+            return byteCode.size();
+        } else {
+            List<JavacError> errors = result.getErrors();
+            for (JavacError err : errors) {
+                assertNotNull(err, "Null err");
+            }
+            return errors.size();
+        }
     }
-    
+
+    static void assertNotNull(Object obj, String msg) {
+        assert obj != null : msg;
+    }
 }

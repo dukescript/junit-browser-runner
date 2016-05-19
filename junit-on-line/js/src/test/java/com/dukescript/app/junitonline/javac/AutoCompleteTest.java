@@ -39,17 +39,42 @@
  *
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
-package com.dukescript.app.junitonline.js;
+package com.dukescript.app.junitonline.javac;
 
-import net.java.html.js.JavaScriptBody;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import net.java.html.junit.BrowserRunner;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-/** Use {@link JavaScriptBody} annotation on methods to
- * directly interact with JavaScript. See
- * http://bits.netbeans.org/html+java/1.2/net/java/html/js/package-summary.html
- * to understand how.
- */
-public final class Dialogs {
-    private Dialogs() {
+
+@RunWith(BrowserRunner.class)
+public class AutoCompleteTest {
+    @Test
+    public String testAutocomplete() throws IOException {
+        String html = "";
+        String java = "package x.y.z;\n"
+                + "class X {\n"
+                + "    public static void main() {new X().runMe(); }\n"
+                + "    public void runMe() {};\n"
+                + "}";
+        JavacResult result = JavacEndpoint.newCompiler().doCompile(
+            new JavacQuery(JavacEndpoint.MsgType.autocomplete, null, html, java, 64)
+        );
+        assertNotNull(result, "Null result");
+
+        List<CompletionItem> completions = result.getCompletions();
+
+        List<String> res = new ArrayList<>(completions.size());
+        for (CompletionItem i : completions) {
+            res.add(i.getText());
+        }
+
+        return res.toString();
     }
-    
+
+    static void assertNotNull(Object obj, String msg) {
+        assert obj != null : msg;
+    }
 }
