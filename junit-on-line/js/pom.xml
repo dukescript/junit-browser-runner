@@ -76,7 +76,7 @@
                   </execution>
               </executions>
               <configuration>
-                  <obfuscation>NONE</obfuscation>
+                  <obfuscation>FULL</obfuscation>
               </configuration>
           </plugin>
           <plugin>
@@ -224,11 +224,13 @@
       <artifactId>emul</artifactId>
       <version>${bck2brwsr.version}</version>
       <classifier>rt</classifier>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apidesign.bck2brwsr</groupId>
       <artifactId>emul.zip</artifactId>
       <version>${bck2brwsr.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apidesign.bck2brwsr</groupId>
