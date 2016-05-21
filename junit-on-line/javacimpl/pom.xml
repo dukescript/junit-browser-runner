@@ -34,7 +34,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Export-Package>com.sun.tools.javac.api,com.sun.tools.javac.parser</Export-Package>
+                        <Export-Package>com.sun.tools.javac.*</Export-Package>
                         <Private-Package>com.sun.tools.*</Private-Package>
                     </instructions>
                 </configuration>
@@ -50,6 +50,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <ignoreBootClassPath>false</ignoreBootClassPath>
+                </configuration>
             </plugin>
         </plugins>
     </build>
