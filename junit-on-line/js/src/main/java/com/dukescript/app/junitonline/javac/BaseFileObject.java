@@ -26,7 +26,7 @@ public abstract class BaseFileObject implements JavaFileObject {
 
 
     public String infer() {
-        return ClassLoaderFileManager.convertResourceToFQN(path);
+        return URLFileManager.convertResourceToFQN(path);
     }
 
     @Override

@@ -45,6 +45,7 @@ import com.dukescript.app.junitonline.nbjava.CompilationInfo;
 import com.dukescript.app.junitonline.nbjava.JavaCompletionItem;
 import com.dukescript.app.junitonline.nbjava.JavaCompletionQuery;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,23 +65,23 @@ final class Compile {
     private final String pkg;
     private final String cls;
     private final String html;
-    private final ClassLoaderFileManager clfm;
+    private final URLFileManager clfm;
     private final CompilationInfo info;
     private Map<String, byte[]> classes = null;
     private List<Diagnostic<? extends JavaFileObject>> errors;
 
-    private Compile(String html, String code) throws IOException {
+    private Compile(String html, String code, URL[] path) throws IOException {
         this.pkg = find("package", ';', code);
         this.cls = find("class ", ' ', code);
         this.html = html;
-        this.clfm = new ClassLoaderFileManager();
+        this.clfm = new URLFileManager(path);
 
         final JavaFileObject file = clfm.createMemoryFileObject(
-                ClassLoaderFileManager.convertFQNToResource(pkg.isEmpty() ? cls : pkg + "." + cls) + Kind.SOURCE.extension,
+                URLFileManager.convertFQNToResource(pkg.isEmpty() ? cls : pkg + "." + cls) + Kind.SOURCE.extension,
                 Kind.SOURCE,
                 code.getBytes());
         final JavaFileObject htmlFile = clfm.createMemoryFileObject(
-            ClassLoaderFileManager.convertFQNToResource(pkg),
+            URLFileManager.convertFQNToResource(pkg),
             Kind.OTHER,
             html.getBytes());
 
@@ -102,7 +103,14 @@ final class Compile {
     /** Performs compilation of given HTML page and associated Java code
      */
     public static Compile create(String html, String code) throws IOException {
-        return new Compile(html, code);
+        URL[] urls = new URL[] {
+            findURL(org.apidesign.bck2brwsr.emul.lang.System.class)
+        };
+        return new Compile(html, code, urls);
+    }
+
+    private static URL findURL(Class<?> c) {
+        return c.getProtectionDomain().getCodeSource().getLocation();
     }
 
     public List<? extends JavaCompletionItem> getCompletions(int offset) {

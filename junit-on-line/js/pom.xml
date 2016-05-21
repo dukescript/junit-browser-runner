@@ -93,7 +93,7 @@
                               <argument>-Dskip.if.exists=true</argument>
                               <argument>-cp</argument>
                               <classpath />
-                              <argument>com.dukescript.app.junitonline.javac.ClassLoaderFileManager</argument>
+                              <argument>com.dukescript.app.junitonline.javac.URLFileManager</argument>
                               <argument>${project.build.directory}/classes/com/dukescript/app/junitonline/javac/</argument>
                           </arguments>
                       </configuration>
@@ -167,7 +167,9 @@
         <classifier>bck2brwsr</classifier>
         <type>jar</type>
     </dependency>
-    ... End of Bck2Brwsr VM presenter for BrowserRunner -->
+    <!- - End of Bck2Brwsr VM presenter for BrowserRunner -->
+
+    <!-- dependencies needed for compilation with Javac -->
     <dependency>
       <groupId>org.netbeans.html</groupId>
       <artifactId>net.java.html.json</artifactId>
@@ -178,6 +180,20 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>javacapi</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>javacapi</artifactId>
+      <version>${project.version}</version>
+      <classifier>bck2brwsr</classifier>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>javacimpl</artifactId>
+      <version>${project.version}</version>
+      <classifier>bck2brwsr</classifier>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>

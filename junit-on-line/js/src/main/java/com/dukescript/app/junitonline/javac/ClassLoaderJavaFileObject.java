@@ -42,7 +42,6 @@
 package com.dukescript.app.junitonline.javac;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -56,18 +55,16 @@ import java.io.Writer;
  * @author Tomas Zezula
  */
 class ClassLoaderJavaFileObject extends BaseFileObject {
+    private final URLFileManager manager;
 
-    ClassLoaderJavaFileObject(final String path) {
+    ClassLoaderJavaFileObject(URLFileManager manager, final String path) {
         super(path, getKind(path));
+        this.manager = manager;
     }
 
     @Override
     public InputStream openInputStream() throws IOException {
-        final InputStream in = getClass().getClassLoader().getResourceAsStream(path);
-        if (in == null) {
-            throw new FileNotFoundException(path);
-        }
-        return in;
+        return manager.openInputStream(path);
     }
 
     @Override

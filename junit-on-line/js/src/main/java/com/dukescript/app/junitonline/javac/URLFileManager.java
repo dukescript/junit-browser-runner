@@ -43,11 +43,13 @@ package com.dukescript.app.junitonline.javac;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -69,7 +71,7 @@ import static javax.tools.StandardLocation.*;
  *
  * @author Tomas Zezula
  */
-public class ClassLoaderFileManager implements JavaFileManager {
+public class URLFileManager implements JavaFileManager {
 
     private static final Location[] READ_LOCATIONS = {
         PLATFORM_CLASS_PATH,
@@ -87,20 +89,21 @@ public class ClassLoaderFileManager implements JavaFileManager {
     };
 
     private Map<Location, Map<String,List<MemoryFileObject>>> generated;
+    private URLClassLoader classLoader;
 
 
-    ClassLoaderFileManager() {
+    URLFileManager(URL[] path) {
         generated = new HashMap<>();
         for (Location l : WRITE_LOCATIONS) {
             generated.put(l, new HashMap<String, List<MemoryFileObject>>());
         }
+        classLoader = new URLClassLoader(path);
     }
-
 
     @Override
     public ClassLoader getClassLoader(Location location) {
         if (canClassLoad(location)) {
-            return new SafeClassLoader(getClass().getClassLoader());
+            return classLoader;
         } else {
             return null;
         }
@@ -118,7 +121,7 @@ public class ClassLoaderFileManager implements JavaFileManager {
         if (location == PLATFORM_CLASS_PATH /*canRead(location)*/) {
             final List<JavaFileObject> res = new ArrayList<JavaFileObject>();
             for (String resource : getResources(convertFQNToResource(packageName))) {
-                final JavaFileObject jfo = new ClassLoaderJavaFileObject(resource);
+                final JavaFileObject jfo = new ClassLoaderJavaFileObject(this, resource);
                 if (kinds.contains(jfo.getKind())) {
                     res.add(jfo);
                 }
@@ -168,7 +171,7 @@ public class ClassLoaderFileManager implements JavaFileManager {
     @Override
     public JavaFileObject getJavaFileForInput(Location location, String className, JavaFileObject.Kind kind) throws IOException {
         if (canRead(location)) {
-            return new ClassLoaderJavaFileObject(convertFQNToResource(className) + kind.extension);
+            return new ClassLoaderJavaFileObject(this, convertFQNToResource(className) + kind.extension);
         } else {
             throw new UnsupportedOperationException("Unsupported location for reading java file: " + location);   //NOI18N
         }
@@ -194,7 +197,7 @@ public class ClassLoaderFileManager implements JavaFileManager {
                 resource.append('/');   //NOI18N
             }
             resource.append(relativeName);
-            return new ClassLoaderJavaFileObject(resource.toString());
+            return new ClassLoaderJavaFileObject(this, resource.toString());
         } else {
             throw new UnsupportedOperationException("Unsupported location for reading file: " + location);   //NOI18N
         }
@@ -239,7 +242,7 @@ public class ClassLoaderFileManager implements JavaFileManager {
         if (content == null) {
             List<String> arr = new ArrayList<>();
             classPathContent.put(folder, arr);
-            InputStream in = ClassLoaderFileManager.class.getResourceAsStream("pkg." + folder.replace('/', '.'));
+            InputStream in = URLFileManager.class.getResourceAsStream("pkg." + folder.replace('/', '.'));
             if (in != null) {
                 BufferedReader r = new BufferedReader(new InputStreamReader(in));
                 for (;;) {
@@ -324,7 +327,7 @@ public class ClassLoaderFileManager implements JavaFileManager {
         }
     }
 
-    private Map<String,List<String>> classPathContent;
+    private static Map<String,List<String>> classPathContent;
 
     private void register(Location loc, String resource, MemoryFileObject jfo) {
         Map<String,List<MemoryFileObject>> folders = generated.get(loc);
@@ -408,33 +411,28 @@ public class ClassLoaderFileManager implements JavaFileManager {
         return res;
     }
 
-    private static final class SafeClassLoader extends ClassLoader {
-        private final ClassLoader delegate;
-
-        SafeClassLoader(final ClassLoader delegate) {
-            this.delegate = delegate;
-
+    InputStream openInputStream(String path) throws IOException {
+        IOException prevEx = null;
+        Enumeration<URL> en = classLoader.getResources(path);
+        StringBuilder sb = new StringBuilder();
+        while (en.hasMoreElements()) {
+            URL element = en.nextElement();
+            final String elementPath = element.toExternalForm();
+            if (elementPath.contains("/rt.jar")) {
+                sb.append("\nskipping ").append(elementPath);
+                continue;
+            }
+            try {
+                return element.openStream();
+            } catch (IOException ex) {
+                prevEx = ex;
+            }
         }
-
-        @Override
-        public URL getResource(String name) {
-            return delegate.getResource(name);
+        FileNotFoundException fnfEx = new FileNotFoundException("Cannot find " + path + sb);
+        if (prevEx != null) {
+            fnfEx.initCause(prevEx);
         }
-
-        @Override
-        public InputStream getResourceAsStream(String name) {
-            return delegate.getResourceAsStream(name);
-        }
-
-        @Override
-        public Enumeration<URL> getResources(String name) throws IOException {
-            return delegate.getResources(name);
-        }
-
-        @Override
-        public Class<?> loadClass(String name) throws ClassNotFoundException {
-            return delegate.loadClass(name);
-        }
+        throw fnfEx;
     }
 
 }
