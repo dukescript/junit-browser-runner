@@ -42,64 +42,31 @@
 package com.dukescript.app.junitonline.javac;
 
 import java.io.IOException;
-import java.util.Arrays;
 import net.java.html.junit.BrowserRunner;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(BrowserRunner.class)
-public class ModelClassTest  {
-//    @Test
-    public String testAnnotationProcessorCompile() throws IOException {
+public class JavaScriptBodyTest  {
+    @Test
+    public void canGenerateCallback() throws IOException {
         String html = "";
-        String java = "package x.y.z;"
-            + "@net.java.html.json.Model(className=\"Y\", properties={})\n"
-            + "class X {\n"
-            + "   static void main(String... args) { Y y = new Y(); }\n"
+        String java = "package x.y.z;\n"
+            + "import net.java.html.js.JavaScriptBody;\n"
+            + "public class X {\n"
+            + "   @JavaScriptBody(args = \"r\", javacall = true, body = \"r.@java.lang.Runnable::run()()\")\n"
+            + "   public static native void call(Runnable r);"
             + "}\n";
+
         Compile result = Compile.create(html, java);
 
-        final byte[] bytes = result.get("x/y/z/Y.class");
-        assertNotNull(bytes, "Class Y is compiled: " + result);
-
-        byte[] out = new byte[256];
-        System.arraycopy(bytes, 0, out, 0, Math.min(out.length, bytes.length));
-        return Arrays.toString(out);
-    }
-
-//    @Test
-    public String modelReferencesClass() throws IOException {
-        String html = "";
-        String java = "package x.y.z;"
-            + "@net.java.html.json.Model(className=\"Y\", properties={\n"
-            + "  @net.java.html.json.Property(name=\"x\",type=X.class, array = true)\n"
-            + "})\n"
-            + "class YImpl {\n"
-            + "  @net.java.html.json.Model(className=\"X\", properties={})\n"
-            + "  static class XImpl {\n"
-            + "  }\n"
-            + "  static void main(String... args) {\n"
-            + "     Y y = new Y(new X(), new X());\n"
-            + "     y.applyBindings();\n"
-            + "  }\n"
-            + "}\n";
-        Compile result = Compile.create(html, java);
-
-        final byte[] bytes = result.get("x/y/z/Y.class");
-        assertNotNull(bytes, "Class Y is compiled: " + result);
-
-        byte[] out = new byte[256];
-        System.arraycopy(bytes, 0, out, 0, Math.min(out.length, bytes.length));
-        return Arrays.toString(out);
+        final byte[] bytes = result.get("x/y/z/X.class");
+        assertNotNull(bytes, "Class X is compiled: " + result);
+        final byte[] bytes2 = result.get("x/y/z/$JsCallbacks$.class");
+        assertNotNull(bytes2, "Class for callbacks is compiled: " + result);
     }
 
     static void assertNotNull(Object obj, String msg) {
         assert obj != null : msg;
-    }
-
-    static void assertEquals(Object real, Object exp, String msg) {
-        if (real == exp) {
-            return;
-        }
-        assert real != null && real.equals(exp) : msg + ". Expected: " + exp + " but was: " + real;
     }
 }
