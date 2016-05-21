@@ -94,12 +94,12 @@ public class ModelClassTest  {
         return Arrays.toString(out);
     }
 
-//    @Test
+    @Test
     public String modelReferencesClass() throws IOException {
         preloadModelJar();
         String html = "";
         String java = "package x.y.z;"
-            + "@net.java.html.json.Model(className=\"Y\", properties={\n"
+            + "@net.java.html.json.Model(className=\"Y\", targetId=\"\", properties={\n"
             + "  @net.java.html.json.Property(name=\"x\",type=X.class, array = true)\n"
             + "})\n"
             + "class YImpl {\n"
