@@ -49,7 +49,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -61,6 +60,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import javax.tools.FileObject;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
@@ -89,7 +89,7 @@ public class URLFileManager implements JavaFileManager {
     };
 
     private Map<Location, Map<String,List<MemoryFileObject>>> generated;
-    private URLClassLoader classLoader;
+    private List<URL> classPath;
 
 
     URLFileManager() throws IOException {
@@ -111,13 +111,13 @@ public class URLFileManager implements JavaFileManager {
         for (Location l : WRITE_LOCATIONS) {
             generated.put(l, new HashMap<String, List<MemoryFileObject>>());
         }
-        classLoader = new URLClassLoader(path.toArray(new URL[path.size()]));
+        classPath = path;
     }
 
     @Override
     public ClassLoader getClassLoader(Location location) {
         if (canClassLoad(location)) {
-            return classLoader;
+            return getClass().getClassLoader();
         } else {
             return null;
         }
@@ -432,27 +432,20 @@ public class URLFileManager implements JavaFileManager {
     }
 
     InputStream openInputStream(String path) throws IOException {
-        IOException prevEx = null;
-        Enumeration<URL> en = classLoader.getResources(path);
-        StringBuilder sb = new StringBuilder();
-        while (en.hasMoreElements()) {
-            URL element = en.nextElement();
-            final String elementPath = element.toExternalForm();
-            if (elementPath.contains("/rt.jar")) {
-                sb.append("\nskipping ").append(elementPath);
-                continue;
-            }
-            try {
-                return element.openStream();
-            } catch (IOException ex) {
-                prevEx = ex;
+        for (URL jar : classPath) {
+            InputStream is = jar.openStream();
+            ZipInputStream zip = new ZipInputStream(is);
+            for (;;) {
+                ZipEntry entry = zip.getNextEntry();
+                if (entry == null) {
+                    break;
+                }
+                if (path.equals(entry.getName())) {
+                    return zip;
+                }
             }
         }
-        FileNotFoundException fnfEx = new FileNotFoundException("Cannot find " + path + sb);
-        if (prevEx != null) {
-            fnfEx.initCause(prevEx);
-        }
-        throw fnfEx;
+        throw new FileNotFoundException("Cannot find " + path + " in:\n" + classPath);
     }
 
 }
