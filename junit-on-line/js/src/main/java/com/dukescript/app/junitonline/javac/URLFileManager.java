@@ -434,7 +434,11 @@ public class URLFileManager implements JavaFileManager {
     
     private static Map<String,byte[]> readAll() throws IOException {
         List<URL> path = new ArrayList<>();
-        try (BufferedReader r = new BufferedReader(new InputStreamReader(URLFileManager.class.getResourceAsStream("pkgs")))) {
+        final InputStream pkgs = URLFileManager.class.getResourceAsStream("pkgs");
+        if (pkgs == null) {
+            return Collections.emptyMap();
+        }
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(pkgs))) {
             for (;;) {
                 String element = r.readLine();
                 if (element == null) {

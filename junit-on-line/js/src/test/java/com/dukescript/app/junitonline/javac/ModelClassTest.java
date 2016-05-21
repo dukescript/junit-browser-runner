@@ -41,15 +41,43 @@
  */
 package com.dukescript.app.junitonline.javac;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Arrays;
+import java.util.Enumeration;
+import net.java.html.json.Model;
 import net.java.html.junit.BrowserRunner;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(BrowserRunner.class)
 public class ModelClassTest  {
-//    @Test
+    static void preloadModelJar() throws IOException {
+        Class<?> clazz = Model.class;
+        assertNotNull(clazz, "JAR is pre-loaded");
+        String name = "META-INF/services/javax.annotation.processing.Processor";
+        System.err.println("getResources " + name);
+        Enumeration<URL> en = clazz.getClassLoader().getResources(name);
+        while (en.hasMoreElements()) {
+            final URL u = en.nextElement();
+            System.err.println("  res: " + u);
+            BufferedReader r = new BufferedReader(new InputStreamReader(u.openStream()));
+            for (;;) {
+                String line = r.readLine();
+                if (line == null) {
+                    break;
+                }
+                System.err.println("  :" + line);
+            }
+            r.close();
+        }
+    }
+
+    @Test
     public String testAnnotationProcessorCompile() throws IOException {
+        preloadModelJar();
         String html = "";
         String java = "package x.y.z;"
             + "@net.java.html.json.Model(className=\"Y\", properties={})\n"
@@ -68,6 +96,7 @@ public class ModelClassTest  {
 
 //    @Test
     public String modelReferencesClass() throws IOException {
+        preloadModelJar();
         String html = "";
         String java = "package x.y.z;"
             + "@net.java.html.json.Model(className=\"Y\", properties={\n"
