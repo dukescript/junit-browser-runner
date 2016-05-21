@@ -42,6 +42,7 @@
 package com.dukescript.app.junitonline.javac;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -89,29 +90,21 @@ public class URLFileManager implements JavaFileManager {
     };
 
     private Map<Location, Map<String,List<MemoryFileObject>>> generated;
-    private List<URL> classPath;
+    private static Map<String,byte[]> classPath;
+    static {
+        try {
+            classPath = readAll();
+        } catch (IOException ex) {
+            throw new IllegalStateException(ex);
+        }
+    }
 
 
     URLFileManager() throws IOException {
-        List<URL> path = new ArrayList<>();
-        try (BufferedReader r = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("pkgs")))) {
-            for (;;) {
-                String element = r.readLine();
-                if (element == null) {
-                    break;
-                }
-                final String resource = "com/dukescript/app/junitonline/libs/" + element;
-                URL found = Compile.class.getClassLoader().getResource(resource);
-                assert found != null : "ClassPath element " + element + " found as " + resource;
-                path.add(found);
-            }
-        }
-
         generated = new HashMap<>();
         for (Location l : WRITE_LOCATIONS) {
             generated.put(l, new HashMap<String, List<MemoryFileObject>>());
         }
-        classPath = path;
     }
 
     @Override
@@ -432,20 +425,64 @@ public class URLFileManager implements JavaFileManager {
     }
 
     InputStream openInputStream(String path) throws IOException {
-        for (URL jar : classPath) {
-            InputStream is = jar.openStream();
-            ZipInputStream zip = new ZipInputStream(is);
-            for (;;) {
-                ZipEntry entry = zip.getNextEntry();
-                if (entry == null) {
-                    break;
-                }
-                if (path.equals(entry.getName())) {
-                    return zip;
-                }
-            }
+        byte[] arr = classPath.get(path);
+        if (arr != null) {
+            return new ByteArrayInputStream(arr);
         }
         throw new FileNotFoundException("Cannot find " + path + " in:\n" + classPath);
     }
-
+    
+    private static Map<String,byte[]> readAll() throws IOException {
+        List<URL> path = new ArrayList<>();
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(URLFileManager.class.getResourceAsStream("pkgs")))) {
+            for (;;) {
+                String element = r.readLine();
+                if (element == null) {
+                    break;
+                }
+                final String resource = "com/dukescript/app/junitonline/libs/" + element;
+                URL found = Compile.class.getClassLoader().getResource(resource);
+                assert found != null : "ClassPath element " + element + " found as " + resource;
+                path.add(found);
+            }
+        }
+        Map<String,byte[]> classes = new HashMap<>();
+        for (URL jar : path) {
+            try (ZipInputStream zip = new ZipInputStream(jar.openStream())) {
+                for (;;) {
+                    ZipEntry entry = zip.getNextEntry();
+                    if (entry == null) {
+                        break;
+                    }
+                    final String name = entry.getName();
+                    if (name.endsWith("/")) {
+                        continue;
+                    }
+                    final int size = (int)entry.getSize();
+                    if (size == -1) {
+                        continue;
+                    }
+                    byte[] arr = new byte[4096];
+                    int offset = 0;
+                    for (;;) {
+                        if (arr.length == offset) {
+                            byte[] old = arr;
+                            arr = new byte[arr.length * 2];
+                            System.arraycopy(old, 0, arr, 0, old.length);
+                        }
+                        int remaining = arr.length - offset;
+                        int read = zip.read(arr, offset, remaining);
+                        if (read == -1) {
+                            break;
+                        }
+                        offset += read;
+                    }
+                    byte[] copy = new byte[offset];
+                    System.arraycopy(arr, 0, copy, 0, offset);
+                    classes.put(name, copy);
+                }
+            }
+        }
+        return classes;
+    }
 }
