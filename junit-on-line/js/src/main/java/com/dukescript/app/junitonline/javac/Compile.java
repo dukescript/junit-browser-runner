@@ -45,7 +45,6 @@ import com.dukescript.app.junitonline.nbjava.CompilationInfo;
 import com.dukescript.app.junitonline.nbjava.JavaCompletionItem;
 import com.dukescript.app.junitonline.nbjava.JavaCompletionQuery;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -104,10 +103,6 @@ final class Compile {
      */
     public static Compile create(String html, String code) throws IOException {
         return new Compile(html, code);
-    }
-
-    private static URL findURL(Class<?> c) {
-        return c.getProtectionDomain().getCodeSource().getLocation();
     }
 
     public List<? extends JavaCompletionItem> getCompletions(int offset) {
