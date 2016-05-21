@@ -264,5 +264,10 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.dukescript.app</groupId>
+            <artifactId>junitonline-js</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>
