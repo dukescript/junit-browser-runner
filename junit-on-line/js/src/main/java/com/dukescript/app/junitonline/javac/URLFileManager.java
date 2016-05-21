@@ -458,10 +458,6 @@ public class URLFileManager implements JavaFileManager {
                     if (name.endsWith("/")) {
                         continue;
                     }
-                    final int size = (int)entry.getSize();
-                    if (size == -1) {
-                        continue;
-                    }
                     byte[] arr = new byte[4096];
                     int offset = 0;
                     for (;;) {
