@@ -70,11 +70,11 @@ final class Compile {
     private Map<String, byte[]> classes = null;
     private List<Diagnostic<? extends JavaFileObject>> errors;
 
-    private Compile(String html, String code, URL[] path) throws IOException {
+    private Compile(String html, String code) throws IOException {
         this.pkg = find("package", ';', code);
         this.cls = find("class ", ' ', code);
         this.html = html;
-        this.clfm = new URLFileManager(path);
+        this.clfm = new URLFileManager();
 
         final JavaFileObject file = clfm.createMemoryFileObject(
                 URLFileManager.convertFQNToResource(pkg.isEmpty() ? cls : pkg + "." + cls) + Kind.SOURCE.extension,
@@ -103,10 +103,7 @@ final class Compile {
     /** Performs compilation of given HTML page and associated Java code
      */
     public static Compile create(String html, String code) throws IOException {
-        URL[] urls = new URL[] {
-            findURL(org.apidesign.bck2brwsr.emul.lang.System.class)
-        };
-        return new Compile(html, code, urls);
+        return new Compile(html, code);
     }
 
     private static URL findURL(Class<?> c) {

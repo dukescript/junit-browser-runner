@@ -92,12 +92,26 @@ public class URLFileManager implements JavaFileManager {
     private URLClassLoader classLoader;
 
 
-    URLFileManager(URL[] path) {
+    URLFileManager() throws IOException {
+        List<URL> path = new ArrayList<>();
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("pkgs")))) {
+            for (;;) {
+                String element = r.readLine();
+                if (element == null) {
+                    break;
+                }
+                final String resource = "com/dukescript/app/junitonline/libs/" + element;
+                URL found = Compile.class.getClassLoader().getResource(resource);
+                assert found != null : "ClassPath element " + element + " found as " + resource;
+                path.add(found);
+            }
+        }
+
         generated = new HashMap<>();
         for (Location l : WRITE_LOCATIONS) {
             generated.put(l, new HashMap<String, List<MemoryFileObject>>());
         }
-        classLoader = new URLClassLoader(path);
+        classLoader = new URLClassLoader(path.toArray(new URL[path.size()]));
     }
 
     @Override
@@ -261,12 +275,12 @@ public class URLFileManager implements JavaFileManager {
     public static void main(String... args) throws Exception {
         File dir = new File(args[0]);
         assert dir.isDirectory() : "Should be a directory " + dir;
+        File libs = new File(args[1]);
+        assert libs.isDirectory() : "Should be a directory " + libs;
 
         Map<String,List<String>> cntent = new HashMap<>();
 
-        final String cp = System.getProperty("java.class.path");
-        for (String entry : cp.split(File.pathSeparator)) {
-            File f = new File(entry);
+        for (File f : libs.listFiles()) {
             if (f.canRead()) {
                 if (f.isFile()) {
                     ZipFile zf = new ZipFile(f);
@@ -304,6 +318,12 @@ public class URLFileManager implements JavaFileManager {
                 w.append(c).append("\n");
             }
             w.close();
+        }
+        try (FileWriter w = new FileWriter(new File(dir, "pkgs"))) {
+            for (File f : libs.listFiles()) {
+                w.write(f.getName());
+                w.write("\n");
+            }
         }
     }
 
