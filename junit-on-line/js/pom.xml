@@ -93,8 +93,9 @@
               </executions>
               <configuration>
                   <outputDirectory>${project.build.directory}/classes/com/dukescript/app/junitonline/libs</outputDirectory>
-                  <includeGroupIds>org.netbeans.html,org.apidesign.bck2brwsr</includeGroupIds>
+                  <includeGroupIds>org.netbeans.html,org.apidesign.bck2brwsr,com.dukescript.api</includeGroupIds>
                   <excludeClassifiers>bck2brwsr</excludeClassifiers>
+                  <excludeArtifactIds>vm4brwsr,launcher,launcher.fx,launcher.http,aot,core</excludeArtifactIds>
               </configuration>
           </plugin>
           <plugin>
@@ -133,13 +134,13 @@
     <dependency>
         <groupId>com.dukescript.api</groupId>
         <artifactId>junit-osgi</artifactId>
-        <scope>test</scope>
+        <scope>compile</scope>
     </dependency>
     <dependency>
         <groupId>com.dukescript.api</groupId>
         <artifactId>junit-browser-runner</artifactId>
         <version>${junit.browser.version}</version>
-        <scope>test</scope>
+        <scope>compile</scope>
         <type>jar</type>
     </dependency>
 

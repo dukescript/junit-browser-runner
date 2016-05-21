@@ -42,36 +42,34 @@
 package com.dukescript.app.junitonline.javac;
 
 import java.io.IOException;
-import java.util.List;
 import net.java.html.junit.BrowserRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 
 @RunWith(BrowserRunner.class)
-public class HelloWorldTest {
-
+public class CompileJUnitTest {
     @Test
-    public int testCompile() throws IOException {
+    public void testCompile() throws IOException {
         String html = "";
-        String java = "package x.y.z;"
-                + "class X {"
-                + "   static void main(String... args) { throw new RuntimeException(\"Hello World!\"); }"
-                + "}";
-        JavacResult result = JavacEndpoint.newCompiler().doCompile(
-            new JavacQuery(JavacEndpoint.MsgType.compile, null, html, java, 0)
-        );
-        assertNotNull(result, "Null result");
+        String java = "package x.y.z;\n"
+                + "import org.junit.*;\n"
+                + "import static org.junit.Assert.*;\n"
+                + "public class SampleTest {\n"
+                + "  @Test\n"
+                + "  public void testMethod() {\n"
+                + "    assertTrue(\"OK\", true);\n"
+                + "  }\n"
+                + "}\n";
+        Compile result = Compile.create(html, java);
 
-        List<JavacClass> classes = result.getClasses();
-        if (classes.size() > 0) {
-            JavacClass clazz = classes.get(0);
-            assertNotNull(clazz, "Null class");
-            List<Byte> byteCode = clazz.getByteCode();
-            return byteCode.size();
-        } else {
-            throw new AssertionError("No class generated: " + result.getErrors());
+        final byte[] bytes = result.get("x/y/z/SampleTest.class");
+
+        if (!result.getErrors().isEmpty()) {
+            throw new AssertionError("Errors found: " + result.getErrors());
         }
+
+        assertNotNull(bytes, "Class X is compiled: " + result);
     }
 
     static void assertNotNull(Object obj, String msg) {
