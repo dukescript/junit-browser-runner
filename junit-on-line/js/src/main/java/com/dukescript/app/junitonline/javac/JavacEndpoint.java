@@ -71,7 +71,7 @@ public final class JavacEndpoint {
         LOG.info("Javac service is available!");
     }
 
-    static JavacEndpoint newCompiler() {
+    public static JavacEndpoint newCompiler() {
         return new JavacEndpoint();
     }
 

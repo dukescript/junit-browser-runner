@@ -72,7 +72,7 @@ import static javax.tools.StandardLocation.*;
  *
  * @author Tomas Zezula
  */
-public class URLFileManager implements JavaFileManager {
+final class URLFileManager implements JavaFileManager {
 
     private static final Location[] READ_LOCATIONS = {
         PLATFORM_CLASS_PATH,

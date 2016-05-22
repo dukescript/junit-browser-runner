@@ -9,7 +9,7 @@ import javax.tools.JavaFileObject;
  *
  * @author Tomas Zezula
  */
-public abstract class BaseFileObject implements JavaFileObject {
+abstract class BaseFileObject implements JavaFileObject {
 
     protected final String path;
     protected final Kind kind;
