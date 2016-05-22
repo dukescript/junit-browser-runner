@@ -19,7 +19,9 @@ public class DataModelTest {
 
     @Test
     public void sourceInitializedAndChanged() {
-        Source src = new Source().putCode("\n\nclass MyTest {\n\n{");
+        Source src = new Source().putCode("\n\nclass MyTest {\n\n}\n");
         assertEquals("MyTest.java", src.getName());
+        src.putName("BetterTest.java");
+        assertEquals("\n\nclass BetterTest {\n\n}\n", src.getCode());
     }
 }

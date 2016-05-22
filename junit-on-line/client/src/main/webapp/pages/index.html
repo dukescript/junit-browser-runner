@@ -5,6 +5,14 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body>
+        <div data-bind="foreach: sources">
+            <br>
+            <input data-bind="textInput: name">
+            <br>
+            <textarea data-bind="value: code"></textarea>
+        </div>
+        <button data-bind="click: addSource">Add source</button>
+        <button data-bind="click: compileRun">Compile and Run</button>
 <!-- ${browser.bootstrap} -->
     </body>
 </html>
