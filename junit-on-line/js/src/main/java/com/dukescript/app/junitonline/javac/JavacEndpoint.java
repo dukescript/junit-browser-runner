@@ -156,7 +156,7 @@ public final class JavacEndpoint {
         @Property(name = "html", type = String.class),
         @Property(name = "java", type = String.class),
         @Property(name = "offset", type = int.class)
-    })
+    }, builder = "put")
     static final class JavacQueryModel {
     }
 

@@ -1,5 +1,8 @@
 package com.dukescript.app.junitonline;
 
+import com.dukescript.app.junitonline.javac.JavacEndpoint;
+import com.dukescript.app.junitonline.javac.JavacQuery;
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.java.html.json.Function;
@@ -70,7 +73,9 @@ final class DataModel {
     }
 
     @Function
-    static void compileRun(Data model) {
+    static void compileRun(Data model) throws IOException {
+        JavacQuery query = new JavacQuery();
+        JavacEndpoint.newCompiler().doCompile(query);
     }
 
     /**

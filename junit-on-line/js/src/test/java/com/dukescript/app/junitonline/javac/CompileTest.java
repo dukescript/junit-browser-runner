@@ -86,7 +86,10 @@ public class CompileTest  {
             + "   class I5 {}\n"
             + "}\n";
         JavacResult result = JavacEndpoint.newCompiler().doCompile(
-            new JavacQuery(JavacEndpoint.MsgType.compile, null, html, java, 0)
+            new JavacQuery()
+            .putType(JavacEndpoint.MsgType.compile)
+            .putHtml(html)
+            .putJava(java)
         );
         assertEquals(result.getClasses().size(), 6, "Six classes generated");
         assertEquals(result.getClasses().get(0).getClassName(), "x/y/z/X.class", "Main class is the first one");

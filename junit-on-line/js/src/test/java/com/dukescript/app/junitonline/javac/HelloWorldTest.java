@@ -59,7 +59,10 @@ public class HelloWorldTest {
                 + "   static void main(String... args) { throw new RuntimeException(\"Hello World!\"); }"
                 + "}";
         JavacResult result = JavacEndpoint.newCompiler().doCompile(
-            new JavacQuery(JavacEndpoint.MsgType.compile, null, html, java, 0)
+            new JavacQuery()
+            .putType(JavacEndpoint.MsgType.compile)
+            .putHtml(html)
+            .putJava(java)
         );
         assertNotNull(result, "Null result");
 
