@@ -16,4 +16,10 @@ public class DataModelTest {
     @Test public void testUIModelWithoutUI() {
         Data model = new Data();
     }
+
+    @Test
+    public void sourceInitializedAndChanged() {
+        Source src = new Source().putCode("\n\nclass MyTest {\n\n{");
+        assertEquals("MyTest.java", src.getName());
+    }
 }
