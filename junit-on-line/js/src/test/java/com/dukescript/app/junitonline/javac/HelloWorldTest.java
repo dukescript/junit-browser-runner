@@ -44,6 +44,7 @@ package com.dukescript.app.junitonline.javac;
 import java.io.IOException;
 import java.util.List;
 import net.java.html.junit.BrowserRunner;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -52,8 +53,7 @@ import org.junit.runner.RunWith;
 public class HelloWorldTest {
 
     @Test
-    public int testCompile() throws IOException {
-        String html = "";
+    public void testCompile() throws IOException {
         String java = "package x.y.z;"
                 + "class X {"
                 + "   static void main(String... args) { throw new RuntimeException(\"Hello World!\"); }"
@@ -61,8 +61,7 @@ public class HelloWorldTest {
         JavacResult result = JavacEndpoint.newCompiler().doCompile(
             new JavacQuery()
             .putType(JavacEndpoint.MsgType.compile)
-            .putHtml(html)
-            .putJava(java)
+            .putSources(new JavacSource().putFileName("X.java").putText(java))
         );
         assertNotNull(result, "Null result");
 
@@ -71,7 +70,7 @@ public class HelloWorldTest {
             JavacClass clazz = classes.get(0);
             assertNotNull(clazz, "Null class");
             List<Byte> byteCode = clazz.getByteCode();
-            return byteCode.size();
+            assertTrue(byteCode.size() > 0);
         } else {
             throw new AssertionError("No class generated: " + result.getErrors());
         }

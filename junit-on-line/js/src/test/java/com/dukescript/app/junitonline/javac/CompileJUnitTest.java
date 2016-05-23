@@ -51,7 +51,6 @@ import org.junit.runner.RunWith;
 public class CompileJUnitTest {
     @Test
     public void testCompile() throws IOException {
-        String html = "";
         String java = "package x.y.z;\n"
                 + "import org.junit.*;\n"
                 + "import static org.junit.Assert.*;\n"
@@ -61,7 +60,7 @@ public class CompileJUnitTest {
                 + "    assertTrue(\"OK\", true);\n"
                 + "  }\n"
                 + "}\n";
-        Compile result = Compile.create(html, java);
+        Compile result = Compile.create(new JavacSource().putFileName("SampleTest.java").putText(java));
 
         final byte[] bytes = result.get("x/y/z/SampleTest.class");
 

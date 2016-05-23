@@ -78,13 +78,12 @@ public class ModelClassTest  {
     @Test
     public String testAnnotationProcessorCompile() throws IOException {
         preloadModelJar();
-        String html = "";
         String java = "package x.y.z;"
             + "@net.java.html.json.Model(className=\"Y\", properties={})\n"
             + "class X {\n"
             + "   static void main(String... args) { Y y = new Y(); }\n"
             + "}\n";
-        Compile result = Compile.create(html, java);
+        Compile result = Compile.create(new JavacSource().putFileName("X.java").putText(java));
 
         final byte[] bytes = result.get("x/y/z/Y.class");
         assertNotNull(bytes, "Class Y is compiled: " + result);
@@ -97,7 +96,6 @@ public class ModelClassTest  {
     @Test
     public String modelReferencesClass() throws IOException {
         preloadModelJar();
-        String html = "";
         String java = "package x.y.z;"
             + "@net.java.html.json.Model(className=\"Y\", targetId=\"\", properties={\n"
             + "  @net.java.html.json.Property(name=\"x\",type=X.class, array = true)\n"
@@ -111,7 +109,7 @@ public class ModelClassTest  {
             + "     y.applyBindings();\n"
             + "  }\n"
             + "}\n";
-        Compile result = Compile.create(html, java);
+        Compile result = Compile.create(new JavacSource().putFileName("X.java").putText(java));
 
         final byte[] bytes = result.get("x/y/z/Y.class");
         assertNotNull(bytes, "Class Y is compiled: " + result);

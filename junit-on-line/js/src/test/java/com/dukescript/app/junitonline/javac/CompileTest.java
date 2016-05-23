@@ -42,7 +42,6 @@
 package com.dukescript.app.junitonline.javac;
 
 import java.io.IOException;
-import java.util.Arrays;
 import net.java.html.junit.BrowserRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,33 +49,31 @@ import org.junit.runner.RunWith;
 @RunWith(BrowserRunner.class)
 public class CompileTest  {
     @Test
-    public String testCompile() throws IOException {
-        String html = "";
+    public void testCompile() throws IOException {
         String java = "package x.y.z;"
             + "class X { "
             + "   static void main(String... args) { throw new RuntimeException(\"Hello brwsr!\"); }"
             + "}";
-        Compile result = Compile.create(html, java);
+        Compile result = Compile.create(new JavacSource().putFileName("X.java").putText(java));
 
         final byte[] bytes = result.get("x/y/z/X.class");
         assertNotNull(bytes, "Class X is compiled: " + result);
-        return Arrays.toString(bytes);
     }
 
-    @Test public void canCompilePublicClass() throws IOException {
-        String html = "";
+    @Test
+    public void canCompilePublicClass() throws IOException {
         String java = "package x.y.z;"
             + "public class X {\n"
             + "   static void main(String... args) { throw new RuntimeException(\"Hello brwsr!\"); }\n"
             + "}\n";
-        Compile result = Compile.create(html, java);
+        Compile result = Compile.create(new JavacSource().putFileName("X.java").putText(java));
 
         final byte[] bytes = result.get("x/y/z/X.class");
         assertNotNull(bytes, "Class X is compiled: " + result);
     }
 
-    @Test public void mainClassIsFirst() throws IOException {
-        String html = "";
+    @Test
+    public void mainClassIsFirst() throws IOException {
         String java = "package x.y.z;"
             + "public class X {\n"
             + "   class I1 {}\n"
@@ -88,8 +85,7 @@ public class CompileTest  {
         JavacResult result = JavacEndpoint.newCompiler().doCompile(
             new JavacQuery()
             .putType(JavacEndpoint.MsgType.compile)
-            .putHtml(html)
-            .putJava(java)
+            .putSources(new JavacSource().putFileName("X.java").putText(java))
         );
         assertEquals(result.getClasses().size(), 6, "Six classes generated");
         assertEquals(result.getClasses().get(0).getClassName(), "x/y/z/X.class", "Main class is the first one");

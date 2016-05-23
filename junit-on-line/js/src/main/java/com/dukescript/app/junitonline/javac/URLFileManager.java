@@ -403,6 +403,11 @@ final class URLFileManager implements JavaFileManager {
     }
 
 
+    JavaFileObject createMemoryFileObject(JavacSource src) {
+        final BaseFileObject jfo  = new MemoryFileObject(src.getFileName(), src.getKind(), src.getText().getBytes());
+        return jfo;
+    }
+
     JavaFileObject createMemoryFileObject (String resourceName, JavaFileObject.Kind kind, byte[] content) {
         final BaseFileObject jfo  = new MemoryFileObject(resourceName, kind, content);
         return jfo;

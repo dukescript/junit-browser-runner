@@ -60,7 +60,8 @@ public class AutoCompleteTest {
                 + "    public void runMe() {};\n"
                 + "}";
         JavacResult result = JavacEndpoint.newCompiler().doCompile(
-            new JavacQuery().putType(JavacEndpoint.MsgType.autocomplete).putHtml(html).putJava(java).putOffset(64)
+            new JavacQuery().putType(JavacEndpoint.MsgType.autocomplete).
+                putOffset(64)
         );
         assertNotNull(result, "Null result");
 

@@ -50,7 +50,6 @@ import org.junit.runner.RunWith;
 public class JavaScriptBodyTest  {
     @Test
     public void canGenerateCallback() throws IOException {
-        String html = "";
         String java = "package x.y.z;\n"
             + "import net.java.html.js.JavaScriptBody;\n"
             + "public class X {\n"
@@ -58,7 +57,7 @@ public class JavaScriptBodyTest  {
             + "   public static native void call(Runnable r);"
             + "}\n";
 
-        Compile result = Compile.create(html, java);
+        Compile result = Compile.create(new JavacSource().putFileName("X.java").putText(java));
 
         final byte[] bytes = result.get("x/y/z/X.class");
         assertNotNull(bytes, "Class X is compiled: " + result);

@@ -53,7 +53,9 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import net.java.html.BrwsrCtx;
 import net.java.html.js.JavaScriptBody;
+import net.java.html.json.ComputedProperty;
 import net.java.html.json.Model;
+import net.java.html.json.ModelOperation;
 import net.java.html.json.Models;
 import net.java.html.json.Property;
 
@@ -98,12 +100,10 @@ public final class JavacEndpoint {
         res.setType(query.getType());
         res.setState(query.getState());
 
-        String java = query.getJava();
-        String html = query.getHtml();
         int offset = query.getOffset();
 
-        if (c == null || !java.equals(c.getJava())) {
-            c = Compile.create(html, java);
+        if (c == null || !query.getSources().equals(c.getSources())) {
+            c = Compile.create(query.getSources());
         }
         switch (query.getType()) {
             case autocomplete:
@@ -153,8 +153,7 @@ public final class JavacEndpoint {
     @Model(className = "JavacQuery", properties = {
         @Property(name = "type", type = MsgType.class),
         @Property(name = "state", type = String.class),
-        @Property(name = "html", type = String.class),
-        @Property(name = "java", type = String.class),
+        @Property(name = "sources", type = JavacSource.class, array = true),
         @Property(name = "offset", type = int.class)
     }, builder = "put")
     static final class JavacQueryModel {
@@ -185,6 +184,33 @@ public final class JavacEndpoint {
                     d.getKind(),
                     d.getMessage(Locale.ENGLISH)
             );
+        }
+    }
+
+    @Model(className = "JavacSource", properties = {
+        @Property(name = "fileName", type = String.class),
+        @Property(name = "text", type = String.class)
+    }, builder = "put", instance = true)
+    static final class JavacSourceModel {
+        private JavaFileObject file;
+
+        @ComputedProperty
+        static JavaFileObject.Kind kind(String fileName) {
+            if (fileName.endsWith(".java")) {
+                return JavaFileObject.Kind.SOURCE;
+            }
+            if (fileName.endsWith(".html")) {
+                return JavaFileObject.Kind.HTML;
+            }
+            if (fileName.endsWith(".class")) {
+                return JavaFileObject.Kind.CLASS;
+            }
+            return JavaFileObject.Kind.OTHER;
+        }
+
+        @ModelOperation
+        void registerFile(JavacSource model, JavaFileObject obj) {
+            this.file = obj;
         }
     }
 

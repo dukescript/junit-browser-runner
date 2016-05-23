@@ -46,63 +46,51 @@ import com.dukescript.app.junitonline.nbjava.JavaCompletionItem;
 import com.dukescript.app.junitonline.nbjava.JavaCompletionQuery;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.tools.Diagnostic;
-import javax.tools.FileObject;
 import javax.tools.ForwardingJavaFileManager;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import javax.tools.JavaFileObject.Kind;
-import javax.tools.StandardLocation;
 
 
 final class Compile {
-
-    private final String pkg;
-    private final String cls;
-    private final String html;
     private final URLFileManager clfm;
     private final CompilationInfo info;
-    private Map<String, byte[]> classes = null;
+    private final List<JavacSource> sources;
+    private Map<String, byte[]> classes;
     private List<Diagnostic<? extends JavaFileObject>> errors;
 
-    private Compile(String html, String code) throws IOException {
-        this.pkg = find("package", ';', code);
-        this.cls = find("class ", ' ', code);
-        this.html = html;
+    private Compile(List<JavacSource> sources) throws IOException {
+        this.sources = sources;
         this.clfm = new URLFileManager();
 
-        final JavaFileObject file = clfm.createMemoryFileObject(
-                URLFileManager.convertFQNToResource(pkg.isEmpty() ? cls : pkg + "." + cls) + Kind.SOURCE.extension,
-                Kind.SOURCE,
-                code.getBytes());
-        final JavaFileObject htmlFile = clfm.createMemoryFileObject(
-            URLFileManager.convertFQNToResource(pkg),
-            Kind.OTHER,
-            html.getBytes());
+        JavaFileObject first = null;
+        for (JavacSource src : sources) {
+            JavaFileObject file = clfm.createMemoryFileObject(src);
+            src.registerFile(file);
+            if (first == null) {
+                first = file;
+            }
+        }
 
         JavaFileManager jfm = new ForwardingJavaFileManager<JavaFileManager>(clfm) {
-            @Override
-            public FileObject getFileForInput(Location location, String packageName, String relativeName) throws IOException {
-                if (location == StandardLocation.SOURCE_PATH) {
-                    if (packageName.equals(pkg)) {
-                        return htmlFile;
-                    }
-                }
-                return null;
-            }
         };
 
-        this.info = new CompilationInfo(file, jfm);
+        this.info = new CompilationInfo(first, jfm);
     }
 
     /** Performs compilation of given HTML page and associated Java code
      */
-    public static Compile create(String html, String code) throws IOException {
-        return new Compile(html, code);
+    public static Compile create(JavacSource... sources) throws IOException {
+        return new Compile(Arrays.asList(sources));
+    }
+    static Compile create(List<JavacSource> sources) throws IOException {
+        return new Compile(sources);
     }
 
     public List<? extends JavaCompletionItem> getCompletions(int offset) {
@@ -131,7 +119,17 @@ final class Compile {
     }
 
     public boolean isMainClass(String name) {
-        return name.endsWith('/' + cls + ".class");
+        if (!name.endsWith(".class")) {
+            return false;
+        }
+        int lastIndex = name.lastIndexOf('/');
+        name = name.substring(lastIndex + 1, name.length() - 6) + ".java";
+        for (JavacSource source : sources) {
+            if (source.getFileName().endsWith(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Obtains errors created during compilation.
@@ -167,12 +165,11 @@ final class Compile {
         throw new IOException("Can't find " + pref + " declaration in the java file");
     }
 
-    String getHtml() {
-        String fqn = "'" + pkg + '.' + cls + "'";
-        return html.replace("'${fqn}'", fqn);
-    }
-
     String getJava() {
         return info != null ? info.getText() : null;
+    }
+
+    List<JavacSource> getSources() {
+        return Collections.unmodifiableList(sources);
     }
 }
