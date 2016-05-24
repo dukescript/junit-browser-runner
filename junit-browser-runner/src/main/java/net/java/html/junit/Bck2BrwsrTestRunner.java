@@ -96,7 +96,8 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
                     if (sharedLauncher instanceof Launcher) {
                         launcher = (Launcher) sharedLauncher;
                     } else {
-                        sharedLauncher = launcher = Launcher.createBrowser(System.getProperty("junit.browser"), null, "/net/java/html/junit/runner.html");
+                        UIListener ui = UIListener.getDefault();
+                        sharedLauncher = launcher = Launcher.createBrowser(System.getProperty("junit.browser"), null, ui.getResource());
                         launcher.initialize();
                     }
                     InvocationContext invocation = launcher.createInvocation(BrowserRunner.class, "execute");
@@ -120,11 +121,13 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
         private final Class<?> clazz;
         private MultiNotifier notifier;
         boolean error;
+        private RunListener delegate;
 
         private TestListener(String className) throws ClassNotFoundException {
             log("Searching for", className);
             clazz = Class.forName(className);
             log("Starting the test", clazz);
+            delegate = UIListener.getDefault().getListener();
         }
 
         private final void log(String msg, Object... param) {
@@ -137,47 +140,48 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
             sb.append(text.toString());
         }
 
-        @JavaScriptBody(args = {  }, body = "debugger;")
-        private static void debug() {
-        }
-
         @Override
         public void testIgnored(Description description) throws Exception {
             log("testIgnored", description);
+            delegate.testIgnored(description);
         }
 
         @Override
         public void testAssumptionFailure(Failure failure) {
             log("testAssumptionFailure", failure);
             error = true;
-            debug();
+            delegate.testAssumptionFailure(failure);
         }
 
         @Override
         public void testFailure(Failure failure) throws Exception {
             log("testFailure", failure.getDescription(), failure.getMessage());
             error = true;
-            debug();
+            delegate.testFailure(failure);
         }
 
         @Override
         public void testFinished(Description description) throws Exception {
             log("testFinished", description);
+            delegate.testFinished(description);
         }
 
         @Override
         public void testStarted(Description description) throws Exception {
             log("testStarted", description.getClassName(), description.getMethodName());
+            delegate.testStarted(description);
         }
 
         @Override
         public void testRunFinished(Result result) throws Exception {
             log("testRunFinished", result);
+            delegate.testRunFinished(result);
         }
 
         @Override
         public void testRunStarted(Description description) throws Exception {
             log("testRunStarted", description);
+            delegate.testRunStarted(description);
         }
 
         public void start() throws InterruptedException {

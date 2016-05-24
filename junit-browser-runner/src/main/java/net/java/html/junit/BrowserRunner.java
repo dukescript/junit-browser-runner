@@ -2,7 +2,6 @@ package net.java.html.junit;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -100,9 +99,7 @@ public final class BrowserRunner extends Suite {
                 contexts = ctxs.toArray(new AbstractTestRunner[ctxs.size()]);
                 return contexts;
             }
-
-            URL resource = BrowserRunner.class.getResource("runner.html");
-            url = resource.toURI().toASCIIString();
+            url = UIListener.getDefault().getPage().toURI().toASCIIString();
         } catch (IOException | URISyntaxException ex) {
             throw new InitializationError(ex);
         }
