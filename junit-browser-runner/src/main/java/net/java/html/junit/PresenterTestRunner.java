@@ -28,8 +28,8 @@ import org.netbeans.html.boot.spi.Fn;
 
 final class PresenterTestRunner extends AbstractTestRunner {
     private static final Timer TIMER = new Timer("Invoke Later");
-    final String name;
-    final BrwsrCtx ctx;
+    private final String name;
+    private final BrwsrCtx ctx;
 
     PresenterTestRunner(String name, String url, Fn.Presenter p, Class<?> klass) throws InitializationError {
         this.name = name;

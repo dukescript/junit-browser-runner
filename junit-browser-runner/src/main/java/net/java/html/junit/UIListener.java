@@ -20,7 +20,6 @@ import org.junit.runner.notification.RunListener;
  */
 
 final class UIListener {
-    private static final UIListener INSTANCE = find();
     private final RunListener listener;
     private final URL page;
     private final String resource;
@@ -43,11 +42,7 @@ final class UIListener {
         return resource;
     }
 
-    static UIListener getDefault() {
-        return INSTANCE;
-    }
-
-    private static UIListener find() {
+    static UIListener create() {
         for (RunListener listener : ServiceLoader.load(RunListener.class)) {
             final Class<? extends RunListener> listenerClass = listener.getClass();
             final String name = listenerClass.getSimpleName() + ".html";

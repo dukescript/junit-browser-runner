@@ -13,6 +13,7 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 import static org.junit.Assert.fail;
+
 /*
  * #%L
  * DukeScript JUnit Runner - a library from the DukeScript project.
@@ -96,7 +97,7 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
                     if (sharedLauncher instanceof Launcher) {
                         launcher = (Launcher) sharedLauncher;
                     } else {
-                        UIListener ui = UIListener.getDefault();
+                        UIListener ui = UIListener.create();
                         sharedLauncher = launcher = Launcher.createBrowser(System.getProperty("junit.browser"), null, ui.getResource());
                         launcher.initialize();
                     }
@@ -127,7 +128,7 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
             log("Searching for", className);
             clazz = Class.forName(className);
             log("Starting the test", clazz);
-            delegate = UIListener.getDefault().getListener();
+            delegate = UIListener.create().getListener();
         }
 
         private final void log(String msg, Object... param) {

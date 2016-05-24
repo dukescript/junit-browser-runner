@@ -99,7 +99,7 @@ public final class BrowserRunner extends Suite {
                 contexts = ctxs.toArray(new AbstractTestRunner[ctxs.size()]);
                 return contexts;
             }
-            url = UIListener.getDefault().getPage().toURI().toASCIIString();
+            url = UIListener.create().getPage().toURI().toASCIIString();
         } catch (IOException | URISyntaxException ex) {
             throw new InitializationError(ex);
         }
