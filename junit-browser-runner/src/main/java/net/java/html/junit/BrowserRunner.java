@@ -29,12 +29,15 @@ import org.junit.runners.model.InitializationError;
 
 public final class BrowserRunner extends Suite {
     private final List<Runner> cases;
+    private final List<AbstractTestRunner> runners;
 
     public BrowserRunner(Class<?> klass) throws InitializationError {
         super(klass, Collections.<Runner>emptyList());
         cases = new ArrayList<>();
+        runners = new ArrayList<>();
         for (AbstractTestRunner info : create(klass)) {
             cases.add(new SingleBrowserRunner(info.name(), info, klass));
+            runners.add(info);
         }
         Bck2BrwsrTestRunner.registerRunner(cases, klass);
         if (cases.isEmpty()) {
@@ -50,7 +53,7 @@ public final class BrowserRunner extends Suite {
     public void run(final RunNotifier notifier) {
         try {
             MultiNotifier testNotifier = MultiNotifier.wrap(
-                notifier, getDescription()
+                runners, notifier, getDescription()
             );
             runNoWait(testNotifier);
             testNotifier.waitForAll();

@@ -1,6 +1,7 @@
 package net.java.html.junit;
 
 import net.java.html.js.JavaScriptBody;
+import org.junit.runner.notification.RunListener;
 
 /*
  * #%L
@@ -30,6 +31,7 @@ abstract class AbstractTestRunner {
     static native void exposeHTML(String html);
     
     abstract String name();
+    abstract RunListener listener();
     abstract void invokeLater(Runnable run);
     abstract void invokeNow(Runnable runnable);
 }

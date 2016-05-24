@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.AssumptionViolatedException;
 import org.junit.runner.Description;
@@ -59,8 +60,11 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
 
     @Override
     public void run(final RunNotifier notifier) {
-        MultiNotifier testNotifier = MultiNotifier.wrap(notifier,
-                getDescription());
+        MultiNotifier testNotifier = MultiNotifier.wrap(
+            Collections.nCopies(1, schedule),
+            notifier,
+            getDescription()
+        );
         try {
             for (FrameworkMethod frameworkMethod : getChildren()) {
                 runChild(frameworkMethod, notifier);

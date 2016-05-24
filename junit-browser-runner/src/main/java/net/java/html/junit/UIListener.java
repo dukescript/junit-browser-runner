@@ -45,10 +45,12 @@ final class UIListener {
     static UIListener create() {
         for (RunListener listener : ServiceLoader.load(RunListener.class)) {
             final Class<? extends RunListener> listenerClass = listener.getClass();
-            final String name = listenerClass.getSimpleName() + ".html";
+            String fqnSlash = listenerClass.getName().replace('.', '/');
+            int last = fqnSlash.lastIndexOf('/') + 1;
+            final String name = fqnSlash.substring(last) + ".html";
             URL dynamicURL = listenerClass.getResource(name);
             if (dynamicURL != null) {
-                String resource = listenerClass.getPackage().getName().replace('.', '/') + "/" + name;
+                String resource = fqnSlash.substring(0, last) + name;
                 return new UIListener(listener, dynamicURL, resource);
             }
         }

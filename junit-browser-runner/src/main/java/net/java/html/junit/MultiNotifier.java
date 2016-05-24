@@ -1,6 +1,7 @@
 package net.java.html.junit;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.runner.Description;
@@ -45,10 +46,13 @@ final class MultiNotifier extends RunNotifier {
         this.remaining = new HashSet<>();
     }
 
-    static MultiNotifier wrap(RunNotifier notifier, Description description) {
+    static MultiNotifier wrap(List<AbstractTestRunner> runners, RunNotifier notifier, Description description) {
         if (notifier instanceof MultiNotifier) {
             MultiNotifier prev = (MultiNotifier) notifier;
             return prev;
+        }
+        for (AbstractTestRunner r : runners) {
+            notifier.addListener(r.listener());
         }
         return new MultiNotifier(notifier, description);
     }

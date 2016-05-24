@@ -53,6 +53,11 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
         setTimeout(run, 1);
     }
 
+    @Override
+    RunListener listener() {
+        return null;
+    }
+
     @JavaScriptBody(args = {}, body = "return document && document.getElementById ? true : false;")
     private static boolean isInBrowser() {
         return false;
