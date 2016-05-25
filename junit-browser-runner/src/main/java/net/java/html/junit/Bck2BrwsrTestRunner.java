@@ -107,9 +107,13 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
                         launcher.initialize();
                     }
                     InvocationContext invocation = launcher.createInvocation(BrowserRunner.class, "execute");
-                    invocation.setArguments(clazzToTest.getName());
+                    final String nameToTest = clazzToTest.getName();
+                    invocation.setArguments(nameToTest);
                     String result = invocation.invoke();
-                    if (result == null || result.contains("error:")) {
+
+                    if (result == null  || result.isEmpty() || result.equals("null")) {
+                        // OK
+                    } else {
                         notifier.fireTestFailure(new Failure(description, new Throwable(result)));
                     }
                 } catch (IOException ex) {
