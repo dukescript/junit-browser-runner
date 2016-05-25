@@ -43,16 +43,20 @@ final class UIListener {
     }
 
     static UIListener create() {
-        for (RunListener listener : ServiceLoader.load(RunListener.class)) {
-            final Class<? extends RunListener> listenerClass = listener.getClass();
-            String fqnSlash = listenerClass.getName().replace('.', '/');
-            int last = fqnSlash.lastIndexOf('/') + 1;
-            final String name = fqnSlash.substring(last) + ".html";
-            URL dynamicURL = listenerClass.getResource(name);
-            if (dynamicURL != null) {
-                String resource = fqnSlash.substring(0, last) + name;
-                return new UIListener(listener, dynamicURL, resource);
+        try {
+            for (RunListener listener : ServiceLoader.load(RunListener.class)) {
+                final Class<? extends RunListener> listenerClass = listener.getClass();
+                String fqnSlash = listenerClass.getName().replace('.', '/');
+                int last = fqnSlash.lastIndexOf('/') + 1;
+                final String name = fqnSlash.substring(last) + ".html";
+                URL dynamicURL = listenerClass.getResource(name);
+                if (dynamicURL != null) {
+                    String resource = fqnSlash.substring(0, last) + name;
+                    return new UIListener(listener, dynamicURL, resource);
+                }
             }
+        } catch (Exception | Error ex) {
+            ex.printStackTrace();
         }
         String resource = "/net/java/html/junit/runner.html";
         URL url = UIListener.class.getResource("runner.html");
