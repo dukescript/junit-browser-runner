@@ -36,6 +36,7 @@ final class MultiNotifier extends RunNotifier {
         this.notifier = notifier;
         this.description = description;
         this.remaining = new HashSet<>();
+        this.remaining.add(null);
     }
 
     MultiNotifier(RunListener listener, Description description) {
@@ -44,6 +45,7 @@ final class MultiNotifier extends RunNotifier {
         this.notifier = run;
         this.description = description;
         this.remaining = new HashSet<>();
+        this.remaining.add(null);
     }
 
     static MultiNotifier wrap(List<AbstractTestRunner> runners, RunNotifier notifier, Description description) {
@@ -139,6 +141,7 @@ final class MultiNotifier extends RunNotifier {
     }
 
    private synchronized void finishTest(Description descr) {
+        remaining.remove(null);
         remaining.remove(descr);
         if (remaining.isEmpty()) {
             notifyAll();
