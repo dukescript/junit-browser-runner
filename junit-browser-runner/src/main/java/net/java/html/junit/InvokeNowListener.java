@@ -36,7 +36,11 @@ final class InvokeNowListener extends RunListener {
 
     @Override
     public void testAssumptionFailure(Failure failure) {
-        fire(2, failure);
+        try {
+            fire(2, failure);
+        } catch (Exception ex) {
+            throw new IllegalStateException(ex);
+        }
     }
 
     @Override
@@ -64,7 +68,11 @@ final class InvokeNowListener extends RunListener {
         fire(7, description);
     }
 
-    private void fire(final int type, final Object parameter) {
+    private void fire(final int type, final Object parameter) throws Exception {
+        if (type == 6) {
+            delegate.testRunFinished((Result) parameter);
+            return;
+        }
         schedule.invokeNow(new Runnable() {
             @Override
             public void run() {
