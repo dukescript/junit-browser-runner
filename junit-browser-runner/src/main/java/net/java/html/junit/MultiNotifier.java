@@ -78,32 +78,22 @@ final class MultiNotifier extends RunNotifier {
         finishTest(description);
     }
 
-    public void fireTestFinished() {
-        notifier.fireTestFinished(description);
-        finishTest(description);
-    }
-
     @Override
     public void fireTestStarted(Description descr) {
         registerTest(descr);
-        notifier.fireTestStarted(description);
-    }
-
-    public void fireTestIgnored() {
-        notifier.fireTestIgnored(description);
-        finishTest(description);
+        notifier.fireTestStarted(descr);
     }
 
     @Override
-    public void fireTestFinished(Description description) {
-        notifier.fireTestFinished(description);
-        finishTest(description);
+    public void fireTestFinished(Description descr) {
+        notifier.fireTestFinished(descr);
+        finishTest(descr);
     }
 
     @Override
-    public void fireTestIgnored(Description description) {
-        notifier.fireTestIgnored(description);
-        finishTest(description);
+    public void fireTestIgnored(Description descr) {
+        notifier.fireTestIgnored(descr);
+        finishTest(descr);
     }
 
     @Override
