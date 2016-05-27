@@ -131,13 +131,15 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
         private final Class<?> clazz;
         private MultiNotifier notifier;
         boolean error;
-        private RunListener delegate;
+        private static RunListener delegate;
 
         private TestListener(String className) throws ClassNotFoundException {
             log("Searching for", className);
             clazz = Class.forName(className);
             log("Starting the test", clazz);
-            delegate = UIListener.create().getListener();
+            if (delegate == null) {
+                delegate = UIListener.create().getListener();
+            }
         }
 
         private final void log(String msg, Object... param) {
