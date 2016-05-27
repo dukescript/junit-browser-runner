@@ -50,6 +50,7 @@
     <modules>
         <module>junit-osgi</module>
         <module>junit-browser-runner</module>
+        <module>charts-runner</module>
     </modules>
     <profiles>
         <profile>
