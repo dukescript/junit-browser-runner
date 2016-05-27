@@ -87,17 +87,20 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
 
     private static Object sharedLauncher;
     private static Runner createRunner(final Class<?> clazzToTest) {
-        final Description description = Description.createSuiteDescription(clazzToTest.getSimpleName());
+        final Description suite = Description.createSuiteDescription(clazzToTest.getSimpleName());
+        final Description description = Description.createTestDescription(clazzToTest, "Bck2Brwsr");
+        suite.addChild(description);
+
         Runner runner = new Runner() {
             @Override
             public Description getDescription() {
-                return description;
+                return suite;
             }
 
             @Override
             public void run(RunNotifier notifier) {
                 try {
-                    notifier.fireTestRunStarted(description);
+                    notifier.fireTestStarted(description);
                     Launcher launcher;
                     if (sharedLauncher instanceof Launcher) {
                         launcher = (Launcher) sharedLauncher;
@@ -112,14 +115,12 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
                     String result = invocation.invoke();
 
                     if (result == null  || result.isEmpty() || result.equals("null")) {
-                        // OK
+                        notifier.fireTestFinished(description);
                     } else {
                         notifier.fireTestFailure(new Failure(description, new Throwable(result)));
                     }
                 } catch (IOException ex) {
                     notifier.fireTestFailure(new Failure(description, ex));
-                } finally {
-                    notifier.fireTestFinished(description);
                 }
             }
         };
