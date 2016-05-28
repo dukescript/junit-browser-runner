@@ -4,8 +4,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import org.junit.AssumptionViolatedException;
+import org.junit.Ignore;
+import org.junit.internal.AssumptionViolatedException;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunNotifier;
@@ -59,8 +61,11 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
 
     @Override
     public void run(final RunNotifier notifier) {
-        MultiNotifier testNotifier = MultiNotifier.wrap(notifier,
-                getDescription());
+        MultiNotifier testNotifier = MultiNotifier.wrap(
+            Collections.nCopies(1, schedule),
+            notifier,
+            getDescription()
+        );
         try {
             for (FrameworkMethod frameworkMethod : getChildren()) {
                 runChild(frameworkMethod, notifier);
@@ -78,11 +83,11 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
     protected void runChild(FrameworkMethod m, RunNotifier notifier) {
         InBrowserMethod method = (InBrowserMethod) m;
         Description description = describeChild(method);
-        if (isIgnored(method)) {
+        if (method.getAnnotation(Ignore.class) != null) {
             notifier.fireTestIgnored(description);
         } else {
             try {
-                Object test = createTest(method);
+                Object test = method.getMethod().getDeclaringClass().newInstance();
                 Statement before = withBefores(method, test, EmptyStatement.EMPTY);
                 Statement after = withAfters(method, test, EmptyStatement.EMPTY);
                 method.invokeInSteps(notifier, description, before, test, new Object[0], after);
@@ -98,11 +103,6 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
     private class InBrowserMethod extends FrameworkMethod {
         public InBrowserMethod(Method method) {
             super(method);
-        }
-
-        @Override
-        public String getName() {
-            return super.getName() + '[' + browser + ']';
         }
 
         final Object explosive(Object target, Object[] params) throws Throwable {

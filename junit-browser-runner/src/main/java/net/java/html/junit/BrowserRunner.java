@@ -2,11 +2,10 @@ package net.java.html.junit;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.junit.AssumptionViolatedException;
+import org.junit.internal.AssumptionViolatedException;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runner.notification.StoppedByUserException;
@@ -30,12 +29,15 @@ import org.junit.runners.model.InitializationError;
 
 public final class BrowserRunner extends Suite {
     private final List<Runner> cases;
+    private final List<AbstractTestRunner> runners;
 
     public BrowserRunner(Class<?> klass) throws InitializationError {
         super(klass, Collections.<Runner>emptyList());
         cases = new ArrayList<>();
+        runners = new ArrayList<>();
         for (AbstractTestRunner info : create(klass)) {
             cases.add(new SingleBrowserRunner(info.name(), info, klass));
+            runners.add(info);
         }
         Bck2BrwsrTestRunner.registerRunner(cases, klass);
         if (cases.isEmpty()) {
@@ -51,7 +53,7 @@ public final class BrowserRunner extends Suite {
     public void run(final RunNotifier notifier) {
         try {
             MultiNotifier testNotifier = MultiNotifier.wrap(
-                notifier, getDescription()
+                runners, notifier, getDescription()
             );
             runNoWait(testNotifier);
             testNotifier.waitForAll();
@@ -100,9 +102,7 @@ public final class BrowserRunner extends Suite {
                 contexts = ctxs.toArray(new AbstractTestRunner[ctxs.size()]);
                 return contexts;
             }
-
-            URL resource = BrowserRunner.class.getResource("runner.html");
-            url = resource.toURI().toASCIIString();
+            url = UIListener.create().getPage().toURI().toASCIIString();
         } catch (IOException | URISyntaxException ex) {
             throw new InitializationError(ex);
         }

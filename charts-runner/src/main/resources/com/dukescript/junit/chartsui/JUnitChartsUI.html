@@ -15,25 +15,18 @@
 -->
 <html>
     <head>
-        <title>DukeScript JUnit Browser Runner</title>
+        <title>Charts JUnit Runner</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-            footer { position:fixed;bottom:0;left:0;right:0;height:30px; background-color: #a3ce7e; padding-top: 10px }
+            #chart { width: 100%; height: 100%; position:fixed; top:0px; left:0px; }
+            footer { z-index: 10; position:fixed;top:0;left:0;right:0;height:30px; padding-top: 10px }
         </style>
     </head>
     <body>
-        <h1>JUnit Browser Runner</h1>
-        <div id="junit-browser-runner">
-        </div>
-        <center>
-            <img src="dukescript-logo.png">
-        </center>
-        <!-- display the original bck2brwsr UI -->
-        <ul id='bck2brwsr.result'></ul>
-        <!-- end of bck2brwsr UI -->
+        <canvas id="chart"></canvas>
         <footer>
-            <center>Powered by <a href="http://dukescript.com">DukeScript</a> project.</center>
+            <center>Charts JUnit Runner by <a href="http://dukescript.com">DukeScript</a> project.</center>
         </footer>
     </body>
 </html>

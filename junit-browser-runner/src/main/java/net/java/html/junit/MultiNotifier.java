@@ -1,6 +1,7 @@
 package net.java.html.junit;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.runner.Description;
@@ -35,6 +36,7 @@ final class MultiNotifier extends RunNotifier {
         this.notifier = notifier;
         this.description = description;
         this.remaining = new HashSet<>();
+        this.remaining.add(null);
     }
 
     MultiNotifier(RunListener listener, Description description) {
@@ -43,12 +45,16 @@ final class MultiNotifier extends RunNotifier {
         this.notifier = run;
         this.description = description;
         this.remaining = new HashSet<>();
+        this.remaining.add(null);
     }
 
-    static MultiNotifier wrap(RunNotifier notifier, Description description) {
+    static MultiNotifier wrap(List<AbstractTestRunner> runners, RunNotifier notifier, Description description) {
         if (notifier instanceof MultiNotifier) {
             MultiNotifier prev = (MultiNotifier) notifier;
             return prev;
+        }
+        for (AbstractTestRunner r : runners) {
+            notifier.addListener(r.listener());
         }
         return new MultiNotifier(notifier, description);
     }
@@ -72,32 +78,23 @@ final class MultiNotifier extends RunNotifier {
         finishTest(description);
     }
 
-    public void fireTestFinished() {
-        notifier.fireTestFinished(description);
-        finishTest(description);
-    }
-
     @Override
     public void fireTestStarted(Description descr) {
         registerTest(descr);
-        notifier.fireTestStarted(description);
-    }
-
-    public void fireTestIgnored() {
-        notifier.fireTestIgnored(description);
-        finishTest(description);
+        notifier.fireTestStarted(descr);
     }
 
     @Override
-    public void fireTestFinished(Description description) {
-        notifier.fireTestFinished(description);
-        finishTest(description);
+    public void fireTestFinished(Description descr) {
+        if (finishTest(descr)) {
+            notifier.fireTestFinished(descr);
+        }
     }
 
     @Override
-    public void fireTestIgnored(Description description) {
-        notifier.fireTestIgnored(description);
-        finishTest(description);
+    public void fireTestIgnored(Description descr) {
+        notifier.fireTestIgnored(descr);
+        finishTest(descr);
     }
 
     @Override
@@ -134,10 +131,12 @@ final class MultiNotifier extends RunNotifier {
         }
     }
 
-   private synchronized void finishTest(Description descr) {
-        remaining.remove(descr);
+   private synchronized boolean finishTest(Description descr) {
+        remaining.remove(null);
+        boolean found = remaining.remove(descr);
         if (remaining.isEmpty()) {
             notifyAll();
         }
+        return found;
     }
 }

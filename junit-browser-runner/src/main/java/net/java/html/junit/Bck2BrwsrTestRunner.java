@@ -13,6 +13,7 @@ import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 import static org.junit.Assert.fail;
+
 /*
  * #%L
  * DukeScript JUnit Runner - a library from the DukeScript project.
@@ -52,6 +53,11 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
         setTimeout(run, 1);
     }
 
+    @Override
+    RunListener listener() {
+        return null;
+    }
+
     @JavaScriptBody(args = {}, body = "return document && document.getElementById ? true : false;")
     private static boolean isInBrowser() {
         return false;
@@ -81,34 +87,40 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
 
     private static Object sharedLauncher;
     private static Runner createRunner(final Class<?> clazzToTest) {
-        final Description description = Description.createSuiteDescription(clazzToTest.getSimpleName());
+        final Description suite = Description.createSuiteDescription(clazzToTest.getSimpleName());
+        final Description description = Description.createTestDescription(clazzToTest, "Bck2Brwsr");
+        suite.addChild(description);
+
         Runner runner = new Runner() {
             @Override
             public Description getDescription() {
-                return description;
+                return suite;
             }
 
             @Override
             public void run(RunNotifier notifier) {
                 try {
-                    notifier.fireTestRunStarted(description);
+                    notifier.fireTestStarted(description);
                     Launcher launcher;
                     if (sharedLauncher instanceof Launcher) {
                         launcher = (Launcher) sharedLauncher;
                     } else {
-                        sharedLauncher = launcher = Launcher.createBrowser(System.getProperty("junit.browser"), null, "/net/java/html/junit/runner.html");
+                        UIListener ui = UIListener.create();
+                        sharedLauncher = launcher = Launcher.createBrowser(System.getProperty("junit.browser"), null, ui.getResource());
                         launcher.initialize();
                     }
                     InvocationContext invocation = launcher.createInvocation(BrowserRunner.class, "execute");
-                    invocation.setArguments(clazzToTest.getName());
+                    final String nameToTest = clazzToTest.getName();
+                    invocation.setArguments(nameToTest);
                     String result = invocation.invoke();
-                    if (result == null || result.contains("error:")) {
+
+                    if (result == null  || result.isEmpty() || result.equals("null")) {
+                        notifier.fireTestFinished(description);
+                    } else {
                         notifier.fireTestFailure(new Failure(description, new Throwable(result)));
                     }
                 } catch (IOException ex) {
                     notifier.fireTestFailure(new Failure(description, ex));
-                } finally {
-                    notifier.fireTestFinished(description);
                 }
             }
         };
@@ -120,11 +132,15 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
         private final Class<?> clazz;
         private MultiNotifier notifier;
         boolean error;
+        private static RunListener delegate;
 
         private TestListener(String className) throws ClassNotFoundException {
             log("Searching for", className);
             clazz = Class.forName(className);
             log("Starting the test", clazz);
+            if (delegate == null) {
+                delegate = UIListener.create().getListener();
+            }
         }
 
         private final void log(String msg, Object... param) {
@@ -139,39 +155,46 @@ final class Bck2BrwsrTestRunner extends AbstractTestRunner {
 
         @Override
         public void testIgnored(Description description) throws Exception {
-            log("ignored:", description);
+            log("testIgnored", description);
+            delegate.testIgnored(description);
         }
 
         @Override
         public void testAssumptionFailure(Failure failure) {
             log("error:", failure);
             error = true;
+            delegate.testAssumptionFailure(failure);
         }
 
         @Override
         public void testFailure(Failure failure) throws Exception {
             log("error:", failure.getDescription(), failure.getMessage());
             error = true;
+            delegate.testFailure(failure);
         }
 
         @Override
         public void testFinished(Description description) throws Exception {
-            log("finished:", description);
+            log("testFinished", description);
+            delegate.testFinished(description);
         }
 
         @Override
         public void testStarted(Description description) throws Exception {
-            log("started:", description.getClassName(), description.getMethodName());
+            log("testStarted", description.getClassName(), description.getMethodName());
+            delegate.testStarted(description);
         }
 
         @Override
         public void testRunFinished(Result result) throws Exception {
-            log("executed", result.getRunCount(), "tests", "in", result.getRunTime(), "ms", result.getFailureCount(), "failures");
+            log("testRunFinished", result);
+            delegate.testRunFinished(result);
         }
 
         @Override
         public void testRunStarted(Description description) throws Exception {
-            log("starting:", description.getDisplayName());
+            log("testRunStarted", description);
+            delegate.testRunStarted(description);
         }
 
         public void start() throws InterruptedException {

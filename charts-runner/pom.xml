@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<!--
+ #%L
+ DukeScript JUnit Runner - a library from the DukeScript project.
+ Visit http://dukescript.com for support and commercial license.
+ %%
+ Copyright (C) 2015 - 2016 Dukehoff GmbH
+ %%
+ This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0
+ and Eclipse Distribution License v. 1.0 which accompanies this distribution.
+ The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
+ and the Eclipse Distribution License is available at
+ http://www.eclipse.org/org/documents/edl-v10.php.
+ #L%
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+      <groupId>com.dukescript.libraries</groupId>
+      <artifactId>pom</artifactId>
+      <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>junit-charts-runner</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>bundle</packaging>
+
+  <name>JUnit Charts UI</name>
+
+  <properties>
+    <netbeans.compile.on.save>all</netbeans.compile.on.save>
+    <exec.java.bin>${java.home}/bin/java</exec.java.bin>
+    <exec.debug.arg>-Ddebug=false</exec.debug.arg>
+    <bck2brwsr.version>0.19</bck2brwsr.version>
+  </properties>
+  <repositories>
+      <repository>
+          <id>netbeans</id>
+          <name>NetBeans</name>
+          <url>http://bits.netbeans.org/maven2/</url>
+      </repository>
+  </repositories>
+  <build>
+      <plugins>
+          <plugin>
+              <groupId>org.apache.felix</groupId>
+              <artifactId>maven-bundle-plugin</artifactId>
+              <version>2.4.0</version>
+              <extensions>true</extensions>
+              <configuration>
+                  <instructions>
+                      <Export-Package>com.dukescript.junit.chartsui</Export-Package>
+                      <Bundle-SymbolicName>com.dukescript.junit.chartsui</Bundle-SymbolicName>
+                  </instructions>
+              </configuration>
+          </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <version>2.3.2</version>
+              <configuration>
+                  <source>1.8</source>
+                  <target>1.8</target>
+              </configuration>
+          </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
+              <version>2.18.1</version>
+              <configuration>
+                  <junitArtifactName>com.dukescript.api:junit-osgi</junitArtifactName>
+                  <systemPropertyVariables>
+                      <fxpresenter.headless>false</fxpresenter.headless>
+                  </systemPropertyVariables>
+                  <testFailureIgnore>true</testFailureIgnore>
+              </configuration>
+          </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-jar-plugin</artifactId>
+              <version>2.4</version>
+              <configuration>
+                  <archive>
+                      <manifest>
+                          <mainClass>${project.mainclass}</mainClass>
+                          <addClasspath>true</addClasspath>
+                          <classpathPrefix>lib/</classpathPrefix>
+                          <useUniqueVersions>false</useUniqueVersions>
+                      </manifest>
+                  </archive>
+              </configuration>
+          </plugin>
+          <plugin>
+              <artifactId>maven-source-plugin</artifactId>
+              <version>2.2.1</version>
+              <executions>
+                  <execution>
+                      <id>attach-sources</id>
+                      <phase>post-integration-test</phase>
+                      <goals>
+                          <goal>jar-no-fork</goal>
+                      </goals>
+                  </execution>
+              </executions>
+          </plugin>
+      </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+        <groupId>com.dukescript.api</groupId>
+        <artifactId>charts</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.netbeans.api</groupId>
+      <artifactId>org-openide-util-lookup</artifactId>
+      <version>RELEASE81</version>
+      <scope>provided</scope>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+        <groupId>com.dukescript.api</groupId>
+        <artifactId>junit-osgi</artifactId>
+        <scope>compile</scope>
+        <version>4.12</version>
+        <type>jar</type>
+    </dependency>
+
+    <dependency>
+        <groupId>com.dukescript.api</groupId>
+        <artifactId>junit-browser-runner</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <scope>test</scope>
+    </dependency>
+
+    <!-- JavaFX presenter for BrowserRunner -->
+    <dependency>
+        <groupId>org.netbeans.html</groupId>
+        <artifactId>net.java.html.boot.fx</artifactId>
+        <version>${net.java.html.version}</version>
+        <scope>test</scope>
+    </dependency>
+    <!-- End of JavaFX presenter for BrowserRunner -->
+
+    <!-- Nashorn presenter for BrowserRunner -->
+    <dependency>
+      <groupId>org.netbeans.html</groupId>
+      <artifactId>net.java.html.boot.script</artifactId>
+      <version>${net.java.html.version}</version>
+      <scope>test</scope>
+      <type>jar</type>
+    </dependency>
+
+    <!-- Bck2Brwsr VM presenter for BrowserRunner -->
+    <dependency>
+      <groupId>org.apidesign.bck2brwsr</groupId>
+      <artifactId>launcher.http</artifactId>
+      <version>${bck2brwsr.version}</version>
+      <scope>test</scope>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apidesign.bck2brwsr</groupId>
+      <artifactId>ko-bck2brwsr</artifactId>
+      <version>${bck2brwsr.version}</version>
+      <classifier>bck2brwsr</classifier>
+      <scope>test</scope>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+        <groupId>com.dukescript.api</groupId>
+        <artifactId>junit-browser-runner</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+        <classifier>bck2brwsr</classifier>
+        <type>jar</type>
+    </dependency>
+    <!-- End of Bck2Brwsr VM presenter for BrowserRunner -->
+  </dependencies>
+</project>

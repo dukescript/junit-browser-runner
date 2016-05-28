@@ -8,6 +8,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import net.java.html.BrwsrCtx;
 import net.java.html.boot.BrowserBuilder;
+import org.junit.runner.notification.RunListener;
 import org.junit.runners.model.InitializationError;
 import org.netbeans.html.boot.spi.Fn;
 
@@ -28,12 +29,14 @@ import org.netbeans.html.boot.spi.Fn;
 
 final class PresenterTestRunner extends AbstractTestRunner {
     private static final Timer TIMER = new Timer("Invoke Later");
-    final String name;
-    final BrwsrCtx ctx;
+    private final String name;
+    private final BrwsrCtx ctx;
+    private final RunListener listener;
 
     PresenterTestRunner(String name, String url, Fn.Presenter p, Class<?> klass) throws InitializationError {
         this.name = name;
         this.ctx = initPresenter(url, p, klass);
+        this.listener = new InvokeNowListener(this);
     }
 
     static void registerPresenters(List<? super AbstractTestRunner> ctxs, String url, Class<?> klass) throws InitializationError {
@@ -64,6 +67,11 @@ final class PresenterTestRunner extends AbstractTestRunner {
             throw new InitializationError(ex);
         }
         return ret[0];
+    }
+
+    @Override
+    RunListener listener() {
+        return listener;
     }
 
     @Override

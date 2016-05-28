@@ -50,6 +50,7 @@
     <modules>
         <module>junit-osgi</module>
         <module>junit-browser-runner</module>
+        <module>charts-runner</module>
     </modules>
     <profiles>
         <profile>
@@ -89,6 +90,7 @@
                                     <descriptionTemplate>src/license/header.txt</descriptionTemplate>
                                     <roots>
                                         <root>junit-browser-runner</root>
+                                        <root>charts-runner</root>
                                     </roots>
                                 </configuration>
                             </execution>
