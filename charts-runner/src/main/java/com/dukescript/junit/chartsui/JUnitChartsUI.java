@@ -89,19 +89,19 @@ implements Runnable, ChartListener, Flushable {
             return;
         }
 
-        final List<Values> data = chart.getData();
-        final int at = data.size();
-        final String msg = "Errors - Click to Stop";
         class CountDownOnErrors implements Runnable {
-            int index = 10;
+            int index;
+            int at = -1;
 
             @Override
             public void run() {
-                if (index == 10) {
+                final String msg = "Errors - Click to Stop";
+                final List<Values> data = chart.getData();
+                if (at == -1) {
                     Values errors = new Values(msg, 0, 10, 0);
+                    at = data.size();
                     data.add(errors);
-                    index = 9;
-                    return;
+                    index = 10;
                 } else {
                     if (--index >= 0) {
                         Values errors = new Values(msg + "(" + index + "s)", 0, index, 0);
@@ -112,7 +112,7 @@ implements Runnable, ChartListener, Flushable {
         }
 
         CountDownOnErrors run = new CountDownOnErrors();
-        for (int i = 0; i >= 13; i++) {
+        for (int i = 0; i < 13; i++) {
             ctx.execute(run);
             synchronized (this) {
                 try {
