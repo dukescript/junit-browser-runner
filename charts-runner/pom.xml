@@ -111,7 +111,14 @@
     <dependency>
         <groupId>com.dukescript.api</groupId>
         <artifactId>charts</artifactId>
+        <!-- when switching to newer charts, remove testng exclussion -->
         <version>0.8</version>
+        <exclusions>
+            <exclusion>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+            </exclusion>
+        </exclusions>
     </dependency>
     <dependency>
       <groupId>org.netbeans.api</groupId>
