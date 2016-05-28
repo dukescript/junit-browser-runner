@@ -143,14 +143,16 @@ implements ChartListener, Flushable {
     }
 
     @Override
-    public synchronized void chartClick(ChartEvent ce) {
+    public void chartClick(ChartEvent ce) {
+        stopCountDown();
+    }
+
+    private synchronized void stopCountDown() {
         stopCountDown = true;
         notifyAll();
     }
 
     private String display(Description description) {
-        String name = description.getMethodName();
-        int rest = name.indexOf('[');
-        return rest == -1 ? name : name.substring(0, rest);
+        return description.getMethodName();
     }
 }
