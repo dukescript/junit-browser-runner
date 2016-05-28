@@ -155,7 +155,7 @@ implements ChartListener, Flushable {
         for (int i = 0; i < data.size(); i++) {
             Values v = data.get(i);
             String label = v.getLabel();
-            if (label.equals(display(description))) {
+            if (label != null && label.equals(display(description))) {
                 data.set(i, values);
                 return;
             }
