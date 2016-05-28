@@ -18,10 +18,10 @@ import org.openide.util.lookup.ServiceProvider;
 
 @ServiceProvider(service = RunListener.class)
 public final class JUnitChartsUI extends RunListener
-implements Runnable, ChartListener, Flushable {
+implements ChartListener, Flushable {
     private boolean skip;
     private Chart<Values,Config> chart;
-    private boolean animationComplete;
+    private boolean stopCountDown;
     private BrwsrCtx ctx;
 
     public JUnitChartsUI() {
@@ -37,7 +37,6 @@ implements Runnable, ChartListener, Flushable {
                     new Values.Set("Fail", Color.rgba(128, 0, 0, 0.3), Color.rgba(255, 0, 0, 0.9))
                 );
                 tmp.applyTo("chart");
-                tmp.getConfig().callback("onAnimationComplete", this);
                 tmp.addChartListener(this);
                 chart = tmp;
             } catch (Exception e) {
@@ -55,7 +54,6 @@ implements Runnable, ChartListener, Flushable {
         }
         Values current = new Values(display(description), 1, 0, 0);
         getChart().getData().add(current);
-        animationComplete = false;
     }
 
     @Override
@@ -66,7 +64,6 @@ implements Runnable, ChartListener, Flushable {
         final Description description = failure.getDescription();
         Values current = new Values(display(description), 0, 0, 1);
         replace(description, current);
-        animationComplete = false;
     }
 
     @Override
@@ -76,7 +73,6 @@ implements Runnable, ChartListener, Flushable {
         }
         Values current = new Values(display(description), 0, 0.5, 0);
         replace(description, current);
-        animationComplete = false;
     }
 
     @Override
@@ -103,6 +99,10 @@ implements Runnable, ChartListener, Flushable {
                     data.add(errors);
                     index = 10;
                 } else {
+                    if (stopCountDown) {
+                        Values errors = new Values("Re-run tests by click", 0, 0, 0);
+                        data.set(at, errors);
+                    }
                     if (--index >= 0) {
                         Values errors = new Values(msg + "(" + index + "s)", 0, index, 0);
                         data.set(at, errors);
@@ -112,14 +112,20 @@ implements Runnable, ChartListener, Flushable {
         }
 
         CountDownOnErrors run = new CountDownOnErrors();
-        for (int i = 0; i < 13; i++) {
-            ctx.execute(run);
+        for (int i = 0;; i++) {
             synchronized (this) {
                 try {
                     wait(1000);
                 } catch (InterruptedException ex) {
                 }
+                if (stopCountDown) {
+                    continue;
+                }
+                if (i > 13) {
+                    break;
+                }
             }
+            ctx.execute(run);
         }
     }
 
@@ -137,23 +143,8 @@ implements Runnable, ChartListener, Flushable {
     }
 
     @Override
-    public synchronized void run() {
-        animationComplete = true;
-        notifyAll();
-    }
-
-    private synchronized void waitForAnimationImpl(int count) throws Exception {
-        for (int i = 0; i < count * 10; i++) {
-            if (animationComplete) {
-                break;
-            }
-            wait(1000);
-        }
-    }
-
-    @Override
     public synchronized void chartClick(ChartEvent ce) {
-        animationComplete = true;
+        stopCountDown = true;
         notifyAll();
     }
 
