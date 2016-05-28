@@ -3,6 +3,7 @@ package com.dukescript.junit.chartsui;
 import java.io.Flushable;
 import java.io.IOException;
 import java.util.List;
+import java.util.ServiceLoader;
 import net.java.html.BrwsrCtx;
 import net.java.html.charts.Chart;
 import net.java.html.charts.ChartEvent;
@@ -12,10 +13,30 @@ import net.java.html.charts.Config;
 import net.java.html.charts.Values;
 import org.junit.runner.Description;
 import org.junit.runner.Result;
+import org.junit.runner.RunWith;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 import org.openide.util.lookup.ServiceProvider;
 
+/*
+ * #%L
+ * DukeScript JUnit Runner - a library from the DukeScript project.
+ * Visit http://dukescript.com for support and commercial license.
+ * %%
+ * Copyright (C) 2015 - 2016 Dukehoff GmbH
+ * %%
+ * This program and the accompanying materials are made available under the terms of the Eclipse Public License v1.0
+ * and Eclipse Distribution License v. 1.0 which accompanies this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ * http://www.eclipse.org/org/documents/edl-v10.php.
+ * #L%
+ */
+
+/** Sample {@link RunListener}. It is registered via {@link ServiceProvider} so that
+ * {@link ServiceLoader} can find it and use it when executing tests
+ * via {@link RunWith}({BrowserRunner.class).
+ */
 @ServiceProvider(service = RunListener.class)
 public final class JUnitChartsUI extends RunListener
 implements ChartListener, Flushable {

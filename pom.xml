@@ -90,6 +90,7 @@
                                     <descriptionTemplate>src/license/header.txt</descriptionTemplate>
                                     <roots>
                                         <root>junit-browser-runner</root>
+                                        <root>charts-runner</root>
                                     </roots>
                                 </configuration>
                             </execution>
