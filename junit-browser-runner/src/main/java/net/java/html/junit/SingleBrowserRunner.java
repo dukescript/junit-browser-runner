@@ -105,11 +105,6 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
             super(method);
         }
 
-        @Override
-        public String getName() {
-            return super.getName() + '[' + browser + ']';
-        }
-
         final Object explosive(Object target, Object[] params) throws Throwable {
             if (html != null) {
                 AbstractTestRunner.exposeHTML(html);
