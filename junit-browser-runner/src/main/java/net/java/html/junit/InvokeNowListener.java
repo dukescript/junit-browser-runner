@@ -1,5 +1,6 @@
 package net.java.html.junit;
 
+import java.io.Flushable;
 import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
@@ -69,10 +70,6 @@ final class InvokeNowListener extends RunListener {
     }
 
     private void fire(final int type, final Object parameter) throws Exception {
-        if (type == 6) {
-            delegate.testRunFinished((Result) parameter);
-            return;
-        }
         schedule.invokeNow(new Runnable() {
             @Override
             public void run() {
@@ -107,5 +104,13 @@ final class InvokeNowListener extends RunListener {
                 }
             }
         });
+        if (delegate instanceof Flushable && type == 6) {
+            Result result = (Result) parameter;
+            if (!result.wasSuccessful()) {
+                Flushable flush = (Flushable) delegate;
+                flush.flush();
+            }
+            return;
+        }
     }
 }
