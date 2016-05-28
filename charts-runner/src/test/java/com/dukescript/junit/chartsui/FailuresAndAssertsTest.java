@@ -1,8 +1,7 @@
 package com.dukescript.junit.chartsui;
 
 import net.java.html.junit.BrowserRunner;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.assertFalse;
@@ -13,27 +12,26 @@ import static org.junit.Assert.fail;
  */
 @RunWith(BrowserRunner.class)
 public class FailuresAndAssertsTest {
-    @Test public void x1() {
+    @Test public void testAdd() {
+        int x = 1;
+        for (int i = 0; i < 10; i++) {
+            x = x + i;
+        }
+        assertEquals("Value is correct", 46, x);
     }
-    @Test public void x2() {
+    @Test public void mathMin() {
+        assertEquals("Min is 3", 3, Math.min(3, 5));
     }
-    @Test public void x3() {
-    }
-    @Test public void x4() {
-    }
-    @Test public void x5() {
+    @Test public void trueIsntFalse() {
         assertFalse("isn't false", true);
     }
-    @Test public void x6() {
+    @Test public void falseIsFalse() {
+        assertFalse("it is false", false);
     }
-    @Test public void x7() {
-    }
-    @Test public void x8() {
-    }
-    @Test public void x9() {
+    @Test public void throwException() {
         throw new IllegalStateException("HI");
     }
-    @Test public void x10() {
+    @Test public void failingTest() {
         fail("bade");
     }
 }
