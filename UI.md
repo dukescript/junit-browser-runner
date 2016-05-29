@@ -14,7 +14,7 @@ The HTML page and its associated `.class` file need to be named with the same pr
 packaged in the same package of the same `JAR` file. The class needs to be registered using 
 the `java.util.ServiceLoader` mechanism (in the example done by using `@ServiceProvider` annotation).
 
-Once [JUnit Browser Runner](README.md) is started, it uses `ServiceLoader` to discover registered
+Once [JUnit Browser Runner](README.md) (version `0.8` or newer) is started, it uses `ServiceLoader` to discover registered
 `RunListener` implementations with appropriate HTML page. It instantiates the first one and registers
 it as a listener to current JUnit execution. It is up to the listener to update the UI accordingly.
 
