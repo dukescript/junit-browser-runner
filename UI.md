@@ -18,4 +18,16 @@ Once [JUnit Browser Runner](README.md) is started, it uses `ServiceLoader` to di
 `RunListener` implementations with appropriate HTML page. It instantiates the first one and registers
 it as a listener to current JUnit execution. It is up to the listener to update the UI accordingly.
 
-The easiest way to start is to modify/copy the [charts-runner project](charts-runner).
+The easiest way to start is to modify/copy the [charts-runner project](charts-runner) and use for example [Java JQuery API](https://dukescript.com/javadoc/libs/net/java/html/lib/jquery/Exports.html):
+
+```java
+import static net.java.html.lib.jquery.Exports.$;
+
+@ServiceProvider(service = RunListener.class)
+public final class JUnitChartsUI extends RunListener {
+    @Override
+    public void testStarted(final Description description) throws Exception {
+        $("ui").text("Running " + description.getMethodName());
+    }
+}
+```
