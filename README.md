@@ -21,7 +21,8 @@ Yet, it is the easiest way to run your tests in browser (without any Java plugin
 [Java/JavaScript code](http://bits.netbeans.org/html+java/1.3/net/java/html/js/package-summary.html) inside of
 **JavaFX** web view or inside of **Nashorn** scripting engine.
 
-++ Getting Started
+Getting Started
+---------------
 
 The easiest way to get a working environment is to follow the steps described in [the tutorial](http://dukescript.com/best/practices/2016/05/30/test-in-browser.html) - e.g. generate the skeletal project from a [Maven](http://maven.apache.org) archetype:
 
@@ -38,4 +39,4 @@ $ cd yesican
 $ mvn install
 ```
 
-The above creates necessary files and executes the `client/src/test/java/org/your/test/DataModelTest.java` test in  a browser.
+The above creates necessary files and executes the `client/src/test/java/org/your/test/DataModelTest.java` test in  a browser. You can edit the file and re-run the tests then.
