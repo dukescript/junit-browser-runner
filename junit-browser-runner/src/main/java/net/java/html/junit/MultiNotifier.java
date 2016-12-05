@@ -86,9 +86,10 @@ final class MultiNotifier extends RunNotifier {
 
     @Override
     public void fireTestFinished(Description descr) {
-        if (finishTest(descr)) {
+        if (remaining.contains(descr)) {
             notifier.fireTestFinished(descr);
         }
+        finishTest(descr);
     }
 
     @Override
@@ -131,12 +132,11 @@ final class MultiNotifier extends RunNotifier {
         }
     }
 
-   private synchronized boolean finishTest(Description descr) {
+   private synchronized void finishTest(Description descr) {
         remaining.remove(null);
-        boolean found = remaining.remove(descr);
+        remaining.remove(descr);
         if (remaining.isEmpty()) {
             notifyAll();
         }
-        return found;
     }
 }
