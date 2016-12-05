@@ -75,6 +75,7 @@
                       <fxpresenter.headless>false</fxpresenter.headless>
                   </systemPropertyVariables>
                   <testFailureIgnore>true</testFailureIgnore>
+                  <disableXmlReport>true</disableXmlReport>
               </configuration>
           </plugin>
           <plugin>
