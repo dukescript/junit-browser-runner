@@ -92,8 +92,8 @@
     </distributionManagement>
 
     <properties>
-        <net.java.html.version>1.3</net.java.html.version>
-        <bck2brwsr.version>0.19</bck2brwsr.version>
+        <net.java.html.version>1.4</net.java.html.version>
+        <bck2brwsr.version>0.20</bck2brwsr.version>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <netbeans.compile.on.save>none</netbeans.compile.on.save>

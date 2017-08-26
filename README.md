@@ -18,7 +18,7 @@ public class CodeTest {
 
 The code looks like a regular [JUnit](http://junit.org) testing code - one doesn't have to learn any special concepts.
 Yet, it is the easiest way to run your tests in browser (without any Java plugin), or test your mixed 
-[Java/JavaScript code](http://bits.netbeans.org/html+java/1.3/net/java/html/js/package-summary.html) inside of
+[Java/JavaScript code](http://bits.netbeans.org/html+java/1.4/net/java/html/js/package-summary.html) inside of
 **JavaFX** web view or inside of **Nashorn** scripting engine.
 
 Getting Started
@@ -50,7 +50,7 @@ The **JUnit Browser Runner** is configured via `java.util.ServiceLoader` mechani
 <dependency>
   <groupId>org.netbeans.html</groupId>
   <artifactId>net.java.html.boot.script</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
 </dependency>
 ```
 
@@ -60,7 +60,7 @@ If you want to run your tests in a **JavaFX** web view, make sure following depe
 <dependency>
   <groupId>org.netbeans.html</groupId>
   <artifactId>net.java.html.boot.fx</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
 </dependency>
 ```
 
@@ -88,4 +88,4 @@ and finally, if you include necessary [Bck2Brwsr VM](http://bck2brwsr.apidesign.
 <!-- End of Bck2Brwsr VM presenter for BrowserRunner -->
 ```
 
-Other implementations of [Fn.Presenter](http://bits.netbeans.org/html+java/1.3/org/netbeans/html/boot/spi/Fn.Presenter.html) are also automatically recognized, so you can include them on the classpath and the runner picks them up.
+Other implementations of [Fn.Presenter](http://bits.netbeans.org/html+java/1.4/org/netbeans/html/boot/spi/Fn.Presenter.html) are also automatically recognized, so you can include them on the classpath and the runner picks them up.
