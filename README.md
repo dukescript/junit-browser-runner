@@ -71,18 +71,18 @@ and finally, if you include necessary [Bck2Brwsr VM](http://bck2brwsr.apidesign.
 <dependency>
   <groupId>org.apidesign.bck2brwsr</groupId>
   <artifactId>launcher.http</artifactId>
-  <version>0.19</version>
+  <version>0.20</version>
 </dependency>
 <dependency>
   <groupId>org.apidesign.bck2brwsr</groupId>
   <artifactId>ko-bck2brwsr</artifactId>
-  <version>0.19</version>
+  <version>0.20</version>
   <classifier>bck2brwsr</classifier>
 </dependency>
 <dependency>
     <groupId>com.dukescript.api</groupId>
     <artifactId>junit-browser-runner</artifactId>
-    <version>0.8</version>
+    <version>1.0</version>
     <classifier>bck2brwsr</classifier>
 </dependency>
 <!-- End of Bck2Brwsr VM presenter for BrowserRunner -->
