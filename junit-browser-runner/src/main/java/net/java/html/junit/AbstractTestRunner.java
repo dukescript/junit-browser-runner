@@ -20,16 +20,17 @@ import org.junit.runner.notification.RunListener;
 
 abstract class AbstractTestRunner {
 
-    @JavaScriptBody(args = {"html"}, body = ""
-        + "var element = document.getElementById('junit-browser-runner');\n"
-        + "if (!element) {\n" + "  element = document.createElement('div');\n"
-        + "  element.id = 'junit-browser-runner';\n"
-        + "  document.body.appendChild(element);\n"
-        + "}\n"
-        + "element.innerHTML = html;\n"
-    )
+    @JavaScriptBody(args = {"html"}, body = """
+        var element = document.getElementById('junit-browser-runner');
+        if (!element) {
+          element = document.createElement('div');
+          element.id = 'junit-browser-runner';
+          document.body.appendChild(element);
+        }
+        element.innerHTML = html;
+    """)
     static native void exposeHTML(String html);
-    
+
     abstract String name();
     abstract RunListener listener();
     abstract void invokeLater(Runnable run);
