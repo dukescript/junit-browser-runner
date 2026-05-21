@@ -33,15 +33,8 @@
     <netbeans.compile.on.save>all</netbeans.compile.on.save>
     <exec.java.bin>${java.home}/bin/java</exec.java.bin>
     <exec.debug.arg>-Ddebug=false</exec.debug.arg>
-    <bck2brwsr.version>0.19</bck2brwsr.version>
+    <bck2brwsr.version>0.81</bck2brwsr.version>
   </properties>
-  <repositories>
-      <repository>
-          <id>netbeans</id>
-          <name>NetBeans</name>
-          <url>http://bits.netbeans.org/maven2/</url>
-      </repository>
-  </repositories>
   <build>
       <plugins>
           <plugin>
@@ -124,7 +117,7 @@
     <dependency>
       <groupId>org.netbeans.api</groupId>
       <artifactId>org-openide-util-lookup</artifactId>
-      <version>RELEASE81</version>
+      <version>RELEASE121</version>
       <scope>provided</scope>
       <type>jar</type>
     </dependency>
