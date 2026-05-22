@@ -220,27 +220,25 @@
                     <value>${project.version}</value>
                 </configuration>
             </plugin>
-            <plugin><!-- Using jdk 1.5.0_22, package-info.java files are compiled correctly. -->
-                <!--
-                java compiler plugin forked in extra process
-                -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.3</version>
+                <version>3.8.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.frgaal</groupId>
+                        <artifactId>compiler-maven-plugin</artifactId>
+                        <version>24.0.0</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                    <source>${jdkVersion}</source>
-                    <target>${jdkVersion}</target>
-                    <testSource>${jdkVersion}</testSource>
-                    <testTarget>${jdkVersion}</testTarget>
-                    <compilerVersion>1.5</compilerVersion>
-                    <showDeprecation>true</showDeprecation>
-                    <showWarnings>true</showWarnings>
-                    <debug>true</debug>
-                    <fork>true</fork>
+                    <compilerId>frgaal</compilerId>
+                    <source>24</source>
+                    <target>1.8</target>
                     <compilerArgs>
-                        <arg>-Xlint:unchecked</arg>
+                        <arg>-Xlint:deprecation</arg>
+                        <arg>-proc:full</arg>
                     </compilerArgs>
-                    <maxmem>128m</maxmem>
                 </configuration>
             </plugin>
             <plugin>

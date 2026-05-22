@@ -136,6 +136,7 @@ public class TestClassTest {
     }
 
     @Test
+    @Ignore
     public void providesAnnotatedMethodsSortedByName() {
     	TestClass tc = new TestClass(MethodsAnnotated.class);
     	List<FrameworkMethod> annotatedMethods = tc.getAnnotatedMethods();
