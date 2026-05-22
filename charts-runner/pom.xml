@@ -52,10 +52,22 @@
           <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-compiler-plugin</artifactId>
-              <version>2.3.2</version>
+              <version>3.8.1</version>
+              <dependencies>
+                  <dependency>
+                      <groupId>org.frgaal</groupId>
+                      <artifactId>compiler-maven-plugin</artifactId>
+                      <version>24.0.0</version>
+                  </dependency>
+              </dependencies>
               <configuration>
-                  <source>1.7</source>
-                  <target>1.7</target>
+                  <compilerId>frgaal</compilerId>
+                  <source>24</source>
+                  <target>1.8</target>
+                  <compilerArgs>
+                      <arg>-Xlint:deprecation</arg>
+                      <arg>-proc:full</arg>
+                  </compilerArgs>
               </configuration>
           </plugin>
           <plugin>
