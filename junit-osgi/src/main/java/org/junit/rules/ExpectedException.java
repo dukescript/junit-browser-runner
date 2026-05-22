@@ -16,7 +16,7 @@ import org.junit.runners.model.Statement;
  * The {@code ExpectedException} rule allows you to verify that your code
  * throws a specific exception.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  *
  * <pre> public class SimpleExpectedExceptionTest {
  *     &#064;Rule
