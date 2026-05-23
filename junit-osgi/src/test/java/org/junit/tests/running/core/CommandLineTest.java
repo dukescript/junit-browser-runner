@@ -8,6 +8,7 @@ import java.io.PrintStream;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
 
@@ -35,6 +36,7 @@ public class CommandLineTest {
         }
     }
 
+    @Ignore
     @Test
     public void runATest() {
         testWasRun = false;

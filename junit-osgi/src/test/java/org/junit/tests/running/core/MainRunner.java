@@ -47,8 +47,12 @@ public class MainRunner {
      * @return null if System.exit() is not called, Integer.valueof(status) if not
      */
     public Integer runWithCheckForSystemExit(Runnable runnable) {
-        SecurityManager oldSecurityManager = System.getSecurityManager();
-        System.setSecurityManager(new NoExitSecurityManager());
+        Object oldSecurityManager = null;
+        try {
+            oldSecurityManager = installSecurityManager(null);
+        } catch (UnsupportedOperationException | LinkageError err) {
+            // cannot install security manager
+        }
         PrintStream oldOut = System.out;
 
         System.setOut(new PrintStream(new ByteArrayOutputStream()));
@@ -60,8 +64,17 @@ public class MainRunner {
             System.out.println("System.exit() called, value=" + e.getStatus());
             return e.getStatus();
         } finally {
-            System.setSecurityManager(oldSecurityManager);
+            installSecurityManager(oldSecurityManager);
             System.setOut(oldOut);
         }
+    }
+
+    private Object installSecurityManager(Object sm) {
+        SecurityManager osm = System.getSecurityManager();
+        if (sm == null) {
+            sm = new NoExitSecurityManager();
+        }
+        System.setSecurityManager((SecurityManager) sm);
+        return osm;
     }
 }
