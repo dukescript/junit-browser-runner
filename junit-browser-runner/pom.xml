@@ -43,31 +43,6 @@
         </developer>
     </developers>
 
-    <repositories>
-        <repository>
-            <id>snapshots</id>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <url>https://maven.java.net/content/repositories/snapshots/</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>snapshots</id>
-            <url>https://maven.java.net/content/repositories/snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
-
     <licenses>
         <license>
             <name>Eclipse Public License 1.0</name>
@@ -92,10 +67,8 @@
     </distributionManagement>
 
     <properties>
-        <net.java.html.version>1.4</net.java.html.version>
-        <bck2brwsr.version>0.20</bck2brwsr.version>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <net.java.html.version>1.8.2</net.java.html.version>
+        <bck2brwsr.version>0.81</bck2brwsr.version>
         <netbeans.compile.on.save>none</netbeans.compile.on.save>
     </properties>
     <build>
@@ -103,16 +76,28 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>3.8.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.frgaal</groupId>
+                        <artifactId>compiler-maven-plugin</artifactId>
+                        <version>24.0.0</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <compilerId>frgaal</compilerId>
+                    <source>24</source>
+                    <target>1.8</target>
+                    <compilerArgs>
+                        <arg>-Xlint:deprecation</arg>
+                        <arg>-proc:full</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.7</version>
+                <version>3.5.1</version>
                 <configuration>
                     <instructions>
                         <Bundle-Name>${project.artifactId}</Bundle-Name>
@@ -196,21 +181,6 @@
                         <aotDep>com.dukescript.api:junit-osgi</aotDep>
                         <aotDep>org.apidesign.bck2brwsr:launcher.http</aotDep>
                     </aotDeps>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.netbeans.tools</groupId>
-                <artifactId>sigtest-maven-plugin</artifactId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <packages>net.java.html.junit</packages>
                 </configuration>
             </plugin>
         </plugins>
@@ -302,5 +272,47 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>jdk11+</id>
+            <activation>
+                <jdk>[11,)</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.netbeans.html</groupId>
+                    <artifactId>net.java.html.boot.fx</artifactId>
+                    <version>${net.java.html.version}</version>
+                    <scope>runtime</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-web</artifactId>
+                    <version>11.0.2</version>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.netbeans.tools</groupId>
+                        <artifactId>sigtest-maven-plugin</artifactId>
+                        <version>1.7</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <packages>net.java.html.junit</packages>
+                            <release>8</release>
+                            <ignoreJDKClasses>
+                            </ignoreJDKClasses>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>        
     </profiles>
 </project>

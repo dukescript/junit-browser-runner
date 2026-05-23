@@ -6,6 +6,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import net.java.html.BrwsrCtx;
 import net.java.html.boot.BrowserBuilder;
 import org.junit.runner.notification.RunListener;
@@ -48,23 +49,29 @@ final class PresenterTestRunner extends AbstractTestRunner {
     private static BrwsrCtx initPresenter(String url, Fn.Presenter p, final Class<?> klass) throws InitializationError {
         final BrwsrCtx[] ret = {null};
         final CountDownLatch cdl = new CountDownLatch(1);
-        final BrowserBuilder bb = BrowserBuilder.newBrowser(p).loadFinished(new Runnable() {
-            @Override
-            public void run() {
-                ret[0] = BrwsrCtx.findDefault(klass);
-                cdl.countDown();
-            }
+        final InitializationError[] err = { null };
+        final BrowserBuilder bb = BrowserBuilder.newBrowser(p).loadFinished(() -> {
+            ret[0] = BrwsrCtx.findDefault(klass);
+            cdl.countDown();
         }).loadPage(url);
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
                 bb.showAndWait();
+            } catch (LinkageError e) {
+                err[0] = new InitializationError(e);
+                cdl.countDown();
+                e.printStackTrace();
             }
         });
         try {
-            cdl.await();
+            if (!cdl.await(10, TimeUnit.SECONDS)) {
+                throw new InitializationError("Timeout awaiting initialization of " + p.getClass().getName());
+            }
         } catch (InterruptedException ex) {
             throw new InitializationError(ex);
+        }
+        if (err[0] != null) {
+            throw err[0];
         }
         return ret[0];
     }

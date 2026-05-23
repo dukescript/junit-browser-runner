@@ -114,7 +114,7 @@ import org.junit.runners.parameterized.TestWithParameters;
  * }
  * </pre>
  * 
- * <h3>Tests with single parameter</h3>
+ * <h2>Tests with single parameter</h2>
  * <p>
  * If your test needs a single parameter only, you don't have to wrap it with an
  * array. Instead you can provide an <code>Iterable</code> or an array of
