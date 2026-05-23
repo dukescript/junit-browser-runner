@@ -183,24 +183,6 @@
                     </aotDeps>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.netbeans.tools</groupId>
-                <artifactId>sigtest-maven-plugin</artifactId>
-                <version>1.7</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <packages>net.java.html.junit</packages>
-                    <release>8</release>
-                    <ignoreJDKClasses>
-                    </ignoreJDKClasses>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
     <dependencies>
@@ -309,6 +291,26 @@
                     <scope>runtime</scope>
                 </dependency>
             </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>jakarta.tck</groupId>
+                        <artifactId>sigtest-maven-plugin</artifactId>
+                        <version>2.6</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <packages>net.java.html.junit</packages>
+                            <release>8</release>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>        
     </profiles>
 </project>
