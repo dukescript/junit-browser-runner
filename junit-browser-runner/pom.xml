@@ -59,17 +59,7 @@
         <developerConnection>scm:git:https://github.com/dukescript/junit-browser-runner.git</developerConnection>
         <tag>release-${releaseVersion}</tag>
     </scm>
-    <distributionManagement>
-        <repository>
-            <id>central</id>
-            <url>https://central.sonatype.com</url>
-        </repository>
-        <snapshotRepository>
-            <id>central</id>
-            <url>https://central.sonatype.com</url>
-        </snapshotRepository>
-    </distributionManagement>
-
+    
     <properties>
         <net.java.html.version>1.8.2</net.java.html.version>
         <bck2brwsr.version>0.81</bck2brwsr.version>
