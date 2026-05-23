@@ -355,6 +355,10 @@
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>2.8.2</version>
+                <configuration>
+                    <!-- not releasing new versions of JUnit OSGi for now -->
+                    <skip>true</skip>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-install-plugin</artifactId>
