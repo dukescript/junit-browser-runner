@@ -22,6 +22,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         distribution: 'zulu'
+        java-package: jdk+fx
         java-version: ${{ matrix.java }}
 
     - name: Build with Maven
