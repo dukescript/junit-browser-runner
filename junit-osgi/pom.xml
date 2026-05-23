@@ -74,7 +74,17 @@
         <url>https://github.com/dukescript/junit-browser-runner.git</url>
         <developerConnection>scm:git:https://DukeScript@github.com/dukescript/junit-browser-runner.git</developerConnection>
       <tag>HEAD</tag>
-  </scm>
+    </scm>
+    <distributionManagement>
+        <repository>
+            <id>central</id>
+            <url>https://central.sonatype.com</url>
+        </repository>
+        <snapshotRepository>
+            <id>central</id>
+            <url>https://central.sonatype.com</url>
+        </snapshotRepository>
+    </distributionManagement>
     <issueManagement>
         <system>github</system>
         <url>https://github.com/dukescript/junit-browser-runner/issues</url>
@@ -83,12 +93,6 @@
         <system>jenkins</system>
         <url>https://junit.ci.cloudbees.com/</url>
     </ciManagement>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <properties>
         <jdkVersion>1.7</jdkVersion>
