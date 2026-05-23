@@ -81,12 +81,12 @@
                     <dependency>
                         <groupId>org.frgaal</groupId>
                         <artifactId>compiler-maven-plugin</artifactId>
-                        <version>24.0.0</version>
+                        <version>25.0.0</version>
                     </dependency>
                 </dependencies>
                 <configuration>
                     <compilerId>frgaal</compilerId>
-                    <source>24</source>
+                    <source>25</source>
                     <target>1.8</target>
                     <compilerArgs>
                         <arg>-Xlint:deprecation</arg>
