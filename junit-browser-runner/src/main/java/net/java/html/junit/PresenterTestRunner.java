@@ -50,17 +50,23 @@ final class PresenterTestRunner extends AbstractTestRunner {
         final BrwsrCtx[] ret = {null};
         final CountDownLatch cdl = new CountDownLatch(1);
         final InitializationError[] err = { null };
-        final BrowserBuilder bb = BrowserBuilder.newBrowser(p).loadFinished(() -> {
-            ret[0] = BrwsrCtx.findDefault(klass);
-            cdl.countDown();
-        }).loadPage(url);
-        Executors.newSingleThreadExecutor().execute(() -> {
-            try {
-                bb.showAndWait();
-            } catch (LinkageError e) {
-                err[0] = new InitializationError(e);
+        final BrowserBuilder bb = BrowserBuilder.newBrowser(p).loadFinished(new Runnable() {
+            @Override
+            public void run() {
+                ret[0] = BrwsrCtx.findDefault(klass);
                 cdl.countDown();
-                e.printStackTrace();
+            }
+        }).loadPage(url);
+        Executors.newSingleThreadExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    bb.showAndWait();
+                } catch (LinkageError e) {
+                    err[0] = new InitializationError(e);
+                    cdl.countDown();
+                    e.printStackTrace();
+                }
             }
         });
         try {
