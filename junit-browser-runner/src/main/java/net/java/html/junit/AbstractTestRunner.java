@@ -21,6 +21,11 @@ import org.junit.runner.notification.RunListener;
 abstract class AbstractTestRunner {
 
     @JavaScriptBody(args = {"html"}, body = """
+        var global = (0, eval)("this");
+        if (!global.document) {
+            return false;
+        }
+        var document = global.document;
         var element = document.getElementById('junit-browser-runner');
         if (!element) {
           element = document.createElement('div');
@@ -28,8 +33,9 @@ abstract class AbstractTestRunner {
           document.body.appendChild(element);
         }
         element.innerHTML = html;
+        return true;
     """)
-    static native void exposeHTML(String html);
+    static native boolean exposeHTML(String html);
 
     abstract String name();
     abstract RunListener listener();

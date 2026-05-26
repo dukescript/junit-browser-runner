@@ -107,7 +107,10 @@ final class SingleBrowserRunner extends BlockJUnit4ClassRunner {
 
         final Object explosive(Object target, Object[] params) throws Throwable {
             if (html != null) {
-                AbstractTestRunner.exposeHTML(html);
+                var ok = AbstractTestRunner.exposeHTML(html);
+                if (!ok) {
+                    System.err.println("Cannot install HTML: " + html.split("\n")[0]);
+                }
             }
             return getMethod().invoke(target, params);
         }
